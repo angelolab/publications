@@ -9,48 +9,60 @@
 % the threshold) that belong to each phenotype. It exports the resulting
 % matrix as a csv and saves it as a variable environment.
 
-%% read in cell data
-path = '/Users/erinmccaffrey/Desktop/MIBIProjects/Human_ATB_paper-cohort/all-fields/denoised/';
-dataAll=dataset('File',[path,'/dataPerCell_3px/granA_cellpheno_CS-asinh-norm_matlab_revised.csv'],'Delimiter',','); %concatenated and annotate matrix of all samples
-%converting to matrix. This is not a clean way to do it but oh well for
-%now..
-dataAllMat=dataset2cell(dataAll);
-% subset just the SampleID, cellLabelInImage, and FlowSOMID
-dataAllMat=cell2mat(dataAllMat(2:55713,[1:2,53]));
+%% 1. Read in cell data
 
-%% read in pheno data
-phenoKey=dataset('File',[path,'/dataPerCell_3px/cellpheno_numkey.csv'],'Delimiter',','); 
+path = 'path_to_data';
+
+% import data
+sc_data = [path,'sc_data.csv'];
+opts = detectImportOptions(sc_data);
+
+% convert to a matrix
+dataAll = readtable(sc_data,opts);
+dataAllMat=table2cell(dataAll);
+% subset just the SampleID, cellLabelInImage, and FlowSOMID
+dataAllMat=cell2mat(dataAllMat(:,[1:2,53]));
+
+%% 2. Read in pheno data
+
+phenoKey=readtable([path,'/pheno_key.csv']); 
+
+% sort in descending order of pheno keys
 phenoKey = sortrows(phenoKey, {'Code'}, {'ascend'});
+
+% pull out phenotype names and codes
 pTitles = phenoKey(:,1); %names of the cell types
-phenoTitles=dataset2cell(pTitles);
-phenoTitles=phenoTitles(2:21,:);
+phenoTitles=table2cell(pTitles);
 pCodes = phenoKey(:,2); %numerical code for cell types
-pCodes=dataset2cell(pCodes);
-pCodes=pCodes(2:21,:);
+pCodes=table2cell(pCodes);
 pCodes=cell2mat(pCodes);
 phenoNum = length(pCodes); %number of markers to compare
 
-%% initiate empty matrices for cell neighborhood data
+%% 3. initiate empty matrices for cell neighborhood data
+
 cell_neighbor_counts = zeros(size(dataAllMat,1), phenoNum+2);
 cell_neighbor_freqs = zeros(size(dataAllMat,1), phenoNum+2);
 % add SampleID and cell label info to the matrices
 cell_neighbor_counts(:,1:2) = dataAllMat(:,1:2);
 cell_neighbor_freqs(:,1:2) = dataAllMat(:,1:2);
 
-%% Initiate distance threshold in px and define indices
+%% 4. Initiate distance threshold in px and define indices
+
 t = 50;
 patientIdx = 1;
 cellIdx = 2;
 phenoIdx = 3;
 
-%% Build data matrix for each point
+%% 5. Build data matrix for each point
+
 points = unique(dataAllMat(:,1)); % points in dataset
 cell_count = 1; % for accurate indexing in neighbor matrices
+
 % iterate through all points
 for i=1:length(points)
     point=points(i);
     
-    % load relevant data
+    % load relevant data (distance matrix)
     disp(['Working on point:',num2str(point)]);
     load([path,'/Point',num2str(point),'/cellDistances.mat']);
     
@@ -85,8 +97,9 @@ for i=1:length(points)
     end 
 end
         
-%% export as csv
-resultsPath = '/Users/erinmccaffrey/Desktop/MIBIProjects/Human_ATB_paper-cohort/all-fields/denoised/dataPerCell_3px/';
+%% 6. Export as csv
+
+resultsPath = [path, '/results'];
 channelLabels = ['SampleID';'cellLabelInImage';pTitles.Pheno];
 TEXT.PnS = channelLabels;
 csvwrite_with_headers([resultsPath,'/cell_neighbor_counts_50px.csv'],cell_neighbor_counts,TEXT.PnS)

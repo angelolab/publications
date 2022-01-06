@@ -1,39 +1,48 @@
-%% MIBIannotateCellsinGranulomaZones.m
+%% MIBIannotateCellsinMaskZones.m
 % Author: Erin McCaffrey
-% Modified by: (Insert your name here)
 % This script takes in a mask of any kind of zones. For
 % each point and cell it creates a binary matrix of whether or not that
-% cell label is in the mask area or on the border of the mask.
+% cell label is in the mask area, on the border of the mask, or in the area
+% surrounding the mask
 
-%define path and points
-pathMask = '/Volumes/GoogleDrive/My Drive/Angelo Lab/MATLAB/MIBI_SpatialAnalysis/masks/';
+%% 1. Import data and define points
+pathMask = 'path_to_zone_masks';
 % should be path to segmentation masks for points
-path_segment = '/Volumes/GoogleDrive/My Drive/Angelo Lab/MATLAB/MIBI_SpatialAnalysis/segmentation_data/';
-% should be path to concatenated csv, needs column with point ID and cell
-% label
-path_data = '/Volumes/GoogleDrive/My Drive/Angelo Lab/MATLAB/MIBI_SpatialAnalysis/singlecell_data/';
-points = [3108]; %cohort data to analyze
-dataAll=dataset('File',[path_data,'/200210_DCIScohort_FLOWSOMEPI25numerical.csv'],'Delimiter',','); %concatenated and annotate matrix of all samples
-%converting to matrix for easy indexing
-dataAllCell=dataset2cell(dataAll);
-%subset the 2nd-final row and only numerical columns
-dataAllMat=cell2mat(dataAllCell(2:96649,1:62)); %need to exclude any cols with strings, take row 2:end
+path_segment = 'path_to_segmentation_masks';
+% should be path to concatenated csv w/ column for point ID and cell label
+path_data = 'path_to_sc_data';
+% points to analyze
+points = [3108]; 
 
-%define column with patient Idx and cell label for filetering
+% import data
+sc_data = [path_data,'sc_data.csv'];
+opts = detectImportOptions(sc_data);
+
+% convert to a matrix
+dataAll = readtable(sc_data,opts);
+dataAllMat=table2cell(dataAll);
+% subset just the SampleID, cellLabelInImage
+dataAllMat=cell2mat(dataAllMat(:,[1:2,53]));
+
+%% 2. define column with patient Idx and cell label for filetering
+
 patientIdx = 1; %column with patient label
 cellLabelIdx = 57; %column with cell label corresponding to segmentation mask
 
-%create matrix with just patient IDs and cell labels for points with masks
+%% 3. Create matrix with just patient IDs and cell labels for points with masks
+
 dataAllPatientAndCells=dataAllMat(:,[patientIdx,cellLabelIdx]);
 dataAllPatientAndCells = dataAllPatientAndCells(ismember(dataAllPatientAndCells(:,1), points), :);
 
-%create output matrix
+%% 4. Create output matrix
 n_classes = 2; % number of classifications/regions (ie. mask and periphery)
 cell_mask_data = zeros(size(dataAllPatientAndCells,1),size(dataAllPatientAndCells,2)+n_classes);
 cell_mask_data(:,1)=dataAllPatientAndCells(:,1);
 cell_mask_data(:,2)=dataAllPatientAndCells(:,2);
 maskIdx = 3;
 periphIdx = 4;
+
+%% 5. Run analysis for each point
 
 %counter for indexing summary matrix
 count=0;
@@ -84,6 +93,7 @@ for p=1:length(points)
     count=count+length(cells);
 end
 
+%% 6. Export data
 colLabels = {'SampleID','cellLabelInImage','In_Mask','In_Mask_Periph'};
 TEXT.PnS = colLabels;
 csvwrite_with_headers([pathMask,'/cell_mask_annotations.csv'],cell_mask_data,TEXT.PnS)

@@ -14,5 +14,5 @@ Description of files:
 6. plot_norm_coef.R: Creates plots analyzing normalization coefficients
     - Generates plots in Supplementary Figure 2
 
-All data tables needed to run these scripts available on Zenodo at https://doi.org/10.5281/zenodo.5945388 
+All data tables needed to run these scripts are available on Zenodo at https://doi.org/10.5281/zenodo.5945388 
 

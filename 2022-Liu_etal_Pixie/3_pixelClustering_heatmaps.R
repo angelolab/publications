@@ -1,4 +1,5 @@
 # Make heatmaps of mean cluster expression
+# Must have created mapping file of each pixel cluster ot its phenotype
 # Author: Candace Liu
 # Date: 8/15/22
 
@@ -12,11 +13,11 @@ sigma = 2 #Gaussian blur sigma used in imageToMatrix.py
 cap = 3 #hierarchical clustering cap
 hclust_coln = "hCluster_cap" #column name of cluster ids
 
-name = "sigma2_passes10_rep1" #name of file generated from pixelClustering.R
+name = "sigma2_passes10_rep1" #name of file output from pixelClustering.R
 clust_path = paste0("pixelClustering_",name,"_clusters.csv")
-clust_to_pheno_path = paste0("pixelClustering_",name,"_mapping.csv") #manual mapping file of each cluster to its phenotype
+clust_to_pheno_path = paste0("pixelClustering_",name,"_mapping.csv") #csv mapping each cluster to its phenotype (must be manually created)
 norm_path = "avg999_sigma2.csv" #99.9% normalization values, generated in pixelClustering.R 
-colors_path = "px_colors.csv" #colors for each pixel cluster, one row for each cluster
+colors_path = "px_colors.csv" #file specifying the colors for each cluster (must be manually created)
 
 # Markers
 cluster_markers = c("CD14","CD209","HLA-DR-DQ-DP","CD4","MPO","CD3","SMA","CD11c","CD68","CD8","CD45","CD21","CD20","CD163","CD206","CD31")

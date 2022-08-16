@@ -1,6 +1,7 @@
 """
-Save pixel phenotype map TIFs with cell border overlaid
-Save TIF were pixel values correspond to pixel cluster id and TIF colored according to pixel cluster id
+Save pixel phenotype map TIFs
+For each FOV, save 1 TIF where pixel values correspond to pixel cluster id and 1 TIF colored according to pixel cluster id
+Must have created mapping file of each pixel cluster to its phenotype
 
 Author: Candace Liu
 Date: 8/15/22
@@ -17,11 +18,11 @@ import scipy.ndimage as ndimage
 
 name = "sigma2_passes10_rep1" #name of file output from pixelClustering.R
 clusters_path = "pixelClustering_"+name+"_clusters.csv"
-clust_coln = "hCluster_cap" #column name of pixel cluster ids
+clust_coln = "hCluster_cap" #column name of cluster ids
 output_dir = "overlays_pxClusterIDs_"+name #output directory to store overlays
 output_dir_colored = "overlays_pxClusterIDs_colored_"+name #output directory to store colored overlays
-clust_to_pheno_path = "pixelClustering_"+name+"_mapping.csv" #csv mapping each cluster to its phenotype
-colors_path = "px_colors.csv" #file specifying the colors for each cluster
+clust_to_pheno_path = "pixelClustering_"+name+"_mapping.csv" #csv mapping each cluster to its phenotype (must be manually created)
+colors_path = "px_colors.csv" #file specifying the colors for each cluster (must be manually created)
 size = 1024 #size of image
 
 # Make output directory

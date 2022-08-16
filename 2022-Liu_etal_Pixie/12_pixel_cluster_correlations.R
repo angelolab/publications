@@ -1,4 +1,5 @@
 # Get correlation of pixel cluster frequency between replicate serial sections
+# Data from Liu and Bosse et al., 2022
 # Author: Candace Liu
 # Date: 8/15/22
 
@@ -11,7 +12,7 @@ num_points = length(unique(point_dat$point))
 
 # Pixel clustering data (pixel clusters generated using pixelClustering.R)
 pixel_dat = fread("pixelClustering_sigma2_clusters.csv") #path to output of pixelClustering.R
-mapping = fread("manual_clusters.csv") #mapping of clusters to phenotype (manually done)
+mapping = fread("manual_clusters.csv") #mapping of clusters to phenotype (must be manually created)
 pixel_dat = pixel_dat[mapping, on=.(cluster)]
 k_clust = length(unique(pixel_dat$phenotype))
 

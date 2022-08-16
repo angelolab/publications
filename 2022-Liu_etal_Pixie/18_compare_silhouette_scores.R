@@ -1,6 +1,6 @@
 # Compare Silhouette scores of cell clustering using pixel composition or integrated expression
 # Author: Candace Liu
-# Dat: 8/16/22
+# Date: 8/15/22
 
 library(data.table)
 library(cluster)

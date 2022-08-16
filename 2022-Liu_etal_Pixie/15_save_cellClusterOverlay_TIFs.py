@@ -1,6 +1,7 @@
 """
 Save cell phenotype map TIFs
-Save TIF where pixel values correspond to cell cluster id and TIF colored according to cell cluster id
+For each FOV, save 1 TIF where pixel values correspond to cell cluster id and 1 TIF colored according to cell cluster id
+Must have created mapping file of each cell cluster to its phenotype
 
 Author: Candace Liu
 Date: 8/15/22
@@ -17,7 +18,7 @@ import scipy.ndimage as ndimage
 
 name = "pixelComposition" #name of output
 clusters_path = "cellClustering_kcell14_passes10_cellRep1.csv" #output of cell clustering
-clust_to_pheno_path = "cellClustering_kcell14_passes10_cellRep1_mapping_manual.csv" #csv mapping each cluster to its phenotype
+clust_to_pheno_path = "cellClustering_kcell14_passes10_cellRep1_mapping_manual.csv" #csv mapping each cluster to its phenotype (must be manually created)
 
 clust_coln = "phenotype_num" #column name of cell cluster ids
 seg_dir = "deepcell_output" #segmentation output

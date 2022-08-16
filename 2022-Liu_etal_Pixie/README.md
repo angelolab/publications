@@ -23,14 +23,14 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Supp. Figure 4c,e
 11. 10_get_pixels_outside_cells.py: Counts percentage of pixels outside of cellular masks
     - Figure 3a-c
-12. 11_compare_pixels_outside_cells.R: Compares of percentage of pixels outside of cellular masks across datasets
+12. 11_compare_pixels_outside_cells.R: Compares percentage of pixels outside of cellular masks across datasets
     - Figure 3d
 13. 12_pixel_cluster_corelations.R: Calculates corrleation of pixel cluster frequency between replicate serial sections
     - Supp. Figure 12
 14. 13_cellClustering_pixelComposition.R: Performs cell clustering using pixel cluster composition
-    - Figure 5c, Supp. Figure 14
+    - Figure 5c, Supp. Figure 13-14
 15. 14_cellClustering_integratedExpression.R: Performs cell clustering using integrated expression (as a comparison)
-    - Figure 5b
+    - Figure 5b, Supp. Figure 13
 16. 15_save_cellClusterOverlay_TIFs.py: Saves cell phenotype maps
     - Figure 5e, Supp. Figure 13-14
 17. 16_cluster_consistency_score_cell.R: Calculates cluster consistency score for 5 replicates of a datset (cell)
@@ -39,7 +39,7 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Supp. Figure 13
 19. 18_compare_silhouette_scores.R: Computes Silhouette scores for cell clustering
     - Figure 5d
-20. 19_som_leiden_phenograph_test.R: Performs time test for different clustering algorithms
+20. 19_som_leiden_phenograph_test.R: Performs runtime test for different clustering algorithms
     - Supp. Figure 15
 
 

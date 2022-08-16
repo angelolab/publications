@@ -1,8 +1,8 @@
 # Code for Liu et al., Robust phenotyping of highly multiplexed tissue imaging data using pixel-level clustering
 
-**User-friendly Jupyter notebooks for running Pixie are available at github.com/angelolab/ark-analysis. Please see that repository to use Pixie for your own data.** The scripts here were used to generate the figures in the paper.
+### User-friendly Jupyter notebooks for running Pixie are available at [github.com/angelolab/ark-analysis](https://github.com/angelolab/ark-analysis). Please see that repository to use Pixie for your own data.
 
-Description of files:
+The scripts here were used to generate the figures in the paper. Description of files:
 1. 0_pixelClustering_functions.R: Functions used for pixel clustering and cell clustering
 2. 1_imageToMatrix.py: Converts single-channel TIFs into pixel x markers matrix, necessary before all pixel clustering
 3. 2_pixelClustering.R: Performs pixel clustering

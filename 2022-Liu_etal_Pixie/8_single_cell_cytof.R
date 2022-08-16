@@ -28,8 +28,24 @@ dt_sub = dt_markers[rand_samp]
 
 ## Test reproducibilty of clustering
 all_seeds = c(2022,32,115,6,22)
-k = 15 #total number of clusters
 
+# Leiden clustering
+cell_dist = dist(dt_sub)
+knn = FindNeighbors(cell_dist, k.param=10)
+one_seed <- function(seed) {
+  leiden = FindClusters(knn$snn, algorithm=4, resolution=0.5, random.seed=seed)
+  return(leiden[,1])
+}
+all_seed_output = lapply(all_seeds, one_seed)
+dt = data.table(rep1=as.integer(all_seed_output[[1]]),
+                rep2=as.integer(all_seed_output[[2]]),
+                rep3=as.integer(all_seed_output[[3]]),
+                rep4=as.integer(all_seed_output[[4]]),
+                rep5=as.integer(all_seed_output[[5]]))
+fwrite(dt,"cytof_leiden.csv")
+
+# FlowSOM clustering
+k = 15 #total number of clusters
 one_seed <- function(seed) {
   set.seed(seed)
   output = SOM(as.matrix(dt_sub))

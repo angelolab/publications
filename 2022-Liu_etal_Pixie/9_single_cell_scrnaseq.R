@@ -53,8 +53,23 @@ ElbowPlot(pbmc)
 
 ## Test reproducibilty of clustering
 all_seeds = c(2022,32,115,6,22)
-k = 15 #number of clusters
 
+# Leiden clustering
+pbmc_neighbors = FindNeighbors(pbmc, dims=1:10)
+one_seed <- function(seed) {
+  output = FindClusters(pbmc_neighbors, algorithm=4, resolution=2, random.seed=seed)
+  return(Idents(output))
+}
+all_seed_output = lapply(all_seeds, one_seed)
+dt = data.table(rep1=as.integer(all_seed_output[[1]]),
+                rep2=as.integer(all_seed_output[[2]]),
+                rep3=as.integer(all_seed_output[[3]]),
+                rep4=as.integer(all_seed_output[[4]]),
+                rep5=as.integer(all_seed_output[[5]]))
+fwrite(dt,"seurat_leiden.csv")
+
+# FlowSOM clustering
+k = 15 #number of clusters
 one_seed <- function(seed) {
   cell_dat = data.table(pbmc$pca@cell.embeddings[,1:10])
   set.seed(seed)

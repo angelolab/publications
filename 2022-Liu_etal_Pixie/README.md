@@ -33,7 +33,7 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Figure 5b, Supp. Figure 16-19
 16. 15_save_cellClusterOverlay_TIFs.py: Saves cell phenotype maps
     - Figure 5e, Supp. Figure 16-19, 21
-17. 16_cluster_consistency_score_cell.R: Calculates cluster consistency score for 5 replicates of a datset (cell)
+17. 16_cluster_consistency_score_cell.R: Calculates cluster consistency score for 5 replicates of a dataset (cell)
     - Supp. Figure 16-17
 18. 17_cluster_consistency_score_cell.py: Completes calculation of cluster consistency score and creates colored overlays
     - Supp. Figure 16-17

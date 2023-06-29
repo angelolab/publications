@@ -43,7 +43,7 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Supp. Figure 17
 21. 20_otsu_thresholding.py: Performs Otsu thresholding on single-channel images
     - Supp. Figure 20
-22. 21_otsu_thresholding_count_combinations.R: Count the number of different phenotypes resulting from Otsu thresholding
+22. 21_otsu_thresholding_count_combinations.R: Counts the number of different phenotypes resulting from Otsu thresholding
     - Supp. Figure 20
 23. 22_pixie_pixels_runtime_test.py: Performs runtime test for pixel clustering in Pixie
     - Supp. Figure 22a

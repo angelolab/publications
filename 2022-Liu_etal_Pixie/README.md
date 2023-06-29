@@ -17,9 +17,9 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Figure 2d-e, Supp. Figure 4-6, 8-12
 8. 7_compare_cluster_consistency_score.R: Compares cluster consistency score between different parameter choices
     - Figure 2f
-9. 8_single_cell_cytof.R: Uses FlowSOM to cluster a single cell CyTOF dataset (Hartmann, et al. 2020)
+9. 8_single_cell_cytof.R: Uses Leiden and FlowSOM to cluster a single cell CyTOF dataset (Hartmann, et al. 2020)
     - Supp. Figure 4c,d
-10. 9_single_cell_scrnaseq.R: Uses FlowSOM to cluster a single-cell RNA-sequencing dataset (Seurat)
+10. 9_single_cell_scrnaseq.R: Uses Leiden and FlowSOM to cluster a single-cell RNA-sequencing dataset (Seurat)
     - Supp. Figure 4c,e
 11. 10_get_pixels_outside_cells.py: Counts percentage of pixels outside of cellular masks
     - Figure 3a-c

@@ -1,6 +1,9 @@
-# Get percentage of pixels outside of cells
-# Author: Candace Liu
-# Date: 8/15/22
+"""
+Get percentage of pixels outside of cells
+Author: Candace Liu
+Date: 8/15/22
+
+"""
 
 import pandas as pd
 import numpy as np

@@ -1,6 +1,6 @@
 # Code for Liu et al., Robust phenotyping of highly multiplexed tissue imaging data using pixel-level clustering
 
-### User-friendly Jupyter notebooks for running Pixie are available at [github.com/angelolab/ark-analysis](https://github.com/angelolab/ark-analysis). Please see that repository to use Pixie for your own data.
+### User-friendly Jupyter notebooks for running Pixie are available at [github.com/angelolab/pixie](https://github.com/angelolab/pixie). Please see that repository to use Pixie for your own data.
 
 The scripts here were used to generate the figures in the paper. Description of files:
 1. 0_pixelClustering_functions.R: Functions for pixel clustering and cell clustering
@@ -39,7 +39,15 @@ The scripts here were used to generate the figures in the paper. Description of 
     - Supp. Figure 16-17
 19. 18_compare_silhouette_scores.R: Computes Silhouette scores for cell clustering
     - Figure 5d
-20. 19_som_leiden_phenograph_test.R: Performs runtime test for different clustering algorithms
-    - Supp. Figure 22
-
-
+20. 19_imageToMatrix_preprocessed.py: Performs pre-processing steps (pixel normalization and channel normalization) on individual images
+    - Supp. Figure 17
+21. 20_otsu_thresholding.py: Performs Otsu thresholding on single-channel images
+    - Supp. Figure 20
+22. 21_otsu_thresholding_count_combinations.R: Count the number of different phenotypes resulting from Otsu thresholding
+    - Supp. Figure 20
+23. 22_pixie_pixels_runtime_test.py: Performs runtime test for pixel clustering in Pixie
+    - Supp. Figure 22a
+24. 23_pixie_cells_runtime_test.py: Performs runtime test for cell clustering in Pixie
+    - Supp. Figure 22b
+25. 24_som_leiden_phenograph_test.R: Performs runtime test for different clustering algorithms
+    - Supp. Figure 22c

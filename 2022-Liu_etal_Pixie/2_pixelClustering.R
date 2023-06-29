@@ -1,5 +1,4 @@
 # Run pixel clustering
-# 5 replicates for cluster consistency score calculation
 # Author: Candace Liu
 # Date: 8/15/22 
 

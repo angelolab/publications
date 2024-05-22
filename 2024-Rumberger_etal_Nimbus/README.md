@@ -31,7 +31,7 @@ The notebooks expect the following folder structure to be present in the same di
 │   ├── experimental_results.csv
 │   ├── gt_pred_ie_consolidated.csv
 ```
-The `DCIS` and `spain_tnbc` folders and the `.csv` files are part of this repository, the other folders are available at huggingface.co/
+The `DCIS` and `spain_tnbc` folders and the `experimental_results.csv` file are part of this repository, the other folders (`codex_colon`, `vectra_colon`, `vectra_pancreas`, `mibi_decidua`) and  the `gt_pred_ie_consolidated.csv` file are available at [huggingface.co/datasets/JLrumberger/Pan-Multiplex](https://huggingface.co/datasets/JLrumberger/Pan-Multiplex). The folder `mibi_breast` will be made available through the huggingface data repository in the coming weeks.
 
 ### Dependencies
 - Python 3.10

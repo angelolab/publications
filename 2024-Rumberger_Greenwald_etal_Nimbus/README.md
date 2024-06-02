@@ -1,4 +1,4 @@
-# Code for Rumberger, Greenwald et al., Improving cell phenotyping by factoring in spatial marker expression patterns with Nimbus
+# Code for Rumberger, Greenwald et al., Automated classification of cellular expression in multiplexed imaging data with Nimbus
 
 ### User-friendly Jupyter notebooks for running Nimbus are available at [github.com/angelolab/Nimbus-Inference](https://github.com/angelolab/Nimbus-Inference). Please see that repository to use Nimbus for your own data.
 

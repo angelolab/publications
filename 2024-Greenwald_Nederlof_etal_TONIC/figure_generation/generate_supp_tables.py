@@ -23,7 +23,7 @@ rna_metadata = rna_metadata.merge(harmonized_metadata[['Patient_ID', 'Tissue_ID'
 harmonized_metadata = harmonized_metadata.loc[harmonized_metadata.MIBI_data_generated, :]
 
 modality = ['MIBI'] * 4 + ['RNA'] * 3 + ['DNA'] * 1
-timepoint = ['primary_untreated', 'baseline', 'post_induction', 'on_nivo'] + ['baseline', 'post_induction', 'on_nivo'] + ['baseline']
+timepoint = ['primary', 'baseline', 'pre_nivo', 'on_nivo'] + ['baseline', 'pre_nivo', 'on_nivo'] + ['baseline']
 
 sample_summary_df = pd.DataFrame({'modality': modality, 'timepoint': timepoint, 'sample_num': [0] * 8, 'patient_num': [0] * 8})
 

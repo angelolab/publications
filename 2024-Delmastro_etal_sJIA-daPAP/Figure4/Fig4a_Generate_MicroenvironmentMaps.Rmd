@@ -1,0 +1,90 @@
+---
+title: "Generate Microenvironment Maps"
+author: "Alea Delmastro"
+date: "2024-05-07"
+output: html_document
+---
+
+# Part 0: Libraries
+
+```{r Part 0}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(raster)
+library(RColorBrewer)
+library("stringr")
+library(tiff)
+library(abind)
+```
+
+# Part 1: Import Cell Table and Segmentation Masks (Data Wrangling)
+
+```{r Part 1}
+#Directories
+home_path <- "/Users/aleadelmastro/Library/CloudStorage/GoogleDrive-alead@stanford.edu/.shortcut-targets-by-id/1GXGQlL1W-w8iJENEwcrx7NBGohHlnlCY/PAP/PAP_MIBI/Cohort/MIBI_data/all_points/"
+seg_path <- seg_path <- paste(home_path, "/segmentation_labels_borders/", sep = "")
+
+#Import cell table
+cell_table <- read.csv(paste(home_path,"celltable_05032024.csv", sep = ""))
+
+#Get Sample IDs
+sample_IDs <- unique(cell_table$point)
+```
+
+## Part 2: Generate Microenvironment Maps
+
+```{r Section 1 Part 2}
+#Step 1: Create CPM Maps Folder
+ME_maps_path <- paste(home_path,"/ME_overlays/", sep = "")
+dir.create(ME_maps_path)
+
+#Step 2: Read in colors for cell phenotypes
+color_key <- read.csv(paste(home_path,"neighborhood_colorkey.csv", sep = ""))
+hex_codes <- color_key$Hex
+
+#Step 2a: If you want to only color a certain ME(s) - i.e. Fig. 4i
+#MEs_interest <- c("1")
+#color_key_sub <- color_key
+#color_key_sub[!color_key_sub$Pheno %in% MEs_interest,]$Hex <- "#CECECE"
+#hex_codes <- color_key_sub$Hex
+
+rgb <- data.frame(t(col2rgb(hex_codes)))
+topics <- color_key$Topic
+rownames(rgb) <- topics
+
+#Step 3: Relabel and recolor each sample segmentation mask by cluster topic number
+for (sample in sample_IDs) {
+    print(paste('Working on point: fov',sample, sep = ""))
+  
+    #Load segmentation mask
+    mask <- as.matrix(raster(paste(seg_path,"fov",sample, "_segmentation_labels.tiff", sep = "")))
+    
+    #Define image size
+    imSize <- dim(mask)
+    
+    #Subset the cluster annotation data matrix for current point
+    cell_table_sample <- cell_table[cell_table$point == sample,]
+    max_cell_label <- max(mask)
+    cluster <- cell_table_sample$topic
+    names(cluster) <- cell_table_sample$label
+    
+    #Define topic number for cell labels 0
+    cluster["0"] <- 0 #0 was used to denote background
+
+    #Go through all labels to relabel as topic number using above 'dictionary'
+    ME_mask <- data.matrix(mapvalues(mask, from = names(cluster), to = unname(cluster)))
+    
+    #Use similar method to generate three matrices (one for red, one for green, and one for blue values)
+    red_mask <- as.matrix(mapvalues(ME_mask, from = rownames(rgb), to = rgb$red))
+    green_mask <- as.matrix(mapvalues(ME_mask, from = rownames(rgb), to = rgb$green))
+    blue_mask <- as.matrix(mapvalues(ME_mask, from = rownames(rgb), to = rgb$blue))
+    
+    #Make a 3d RGB stack
+    rgb_mask <- array(c(as.numeric(red_mask), as.numeric(green_mask), as.numeric(blue_mask)),dim=c(imSize[1], imSize[2], 3)) / 255
+    
+    #Export each recolored image as a TIFF
+    writeTIFF(rgb_mask, paste(ME_maps_path,"fov",sample,".tif", sep=""))
+}
+```

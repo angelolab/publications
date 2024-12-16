@@ -35,6 +35,8 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 #edger v3.40.2
 BiocManager::install("edgeR")
+#statmod v1.5.0
+install.packages('statmod')
 
 ## Logistic regression analysis
 #glmnet v4.1-8

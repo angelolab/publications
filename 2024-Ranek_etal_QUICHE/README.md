@@ -37,20 +37,21 @@ install.packages("devtools")
 install.packages('statmod')
 install.packages('Matrix')
 
-#edger v3.40.2
-BiocManager::install("edgeR")
-
 #glmnet v4.1-8
 install.packages('glmnet')
 
 #survival v3.5-8
 install.packages('survival')
 
+#edger v3.40.2
+BiocManager::install("edgeR")
+
 #splatter v1.18.2
 BiocManager::install("splatter")
 ```
 
 ## Description of files
+* `quiche` contains scripts for performing differential spatial enrichment analysis with QUICHE, benchmarking, and plotting. 
 * `scripts_TNBC_preprocessing`: contains preprocessing scripts for Spain, Stanford, and NeoTRIP cohorts, including cell segmentation, cell phenotyping, tumor region identification, and collagen1 fiber segmentation.
 * `scripts_benchmarking`: contains scripts for benchmarking spatial enrichment methods, including in silico data generation and evaluation.
 * `abundance_prediction.R`: performs logistic regression analysis using cell type abundances.
@@ -58,4 +59,4 @@ BiocManager::install("splatter")
 * `cox_model.R`: performs Cox proportional hazards regression analysis.
 * `figure01-05` reproduce the main figures in the paper.
 * `supplementary_figure01-18` reproduce the supplementary figures in the paper.
-* `supplementary_plot_helpers.py`: contains helper functions for figure generation. 
+* `supplementary_plot_helpers.py`: contains helper functions for figure generation.

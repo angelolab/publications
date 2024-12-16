@@ -30,22 +30,21 @@ conda activate venv_quiche_benchmark
 If you'd like to reproduce some of the analyses from the paper, you'll also need to install the necessary R packages.
 
 ```R
+## QUICHE analysis
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-    
-install.packages("devtools")
-install.packages('statmod')
-install.packages('Matrix')
-
-#glmnet v4.1-8
-install.packages('glmnet')
-
-#survival v3.5-8
-install.packages('survival')
-
 #edger v3.40.2
 BiocManager::install("edgeR")
 
+## Logistic regression analysis
+#glmnet v4.1-8
+install.packages('glmnet')
+
+## Cox proportional hazards regression analysis
+#survival v3.5-8
+install.packages('survival')
+
+## Simulation analysis
 #splatter v1.18.2
 BiocManager::install("splatter")
 ```

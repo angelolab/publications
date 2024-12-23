@@ -15,7 +15,7 @@ import warnings
 from collections.abc import Iterable
 from scipy.ndimage import gaussian_filter
 from scipy import stats
-from scipy.stats import ranksums
+from scipy.stats import ranksums, spearmanr
 from statsmodels.stats.multitest import multipletests
 import seaborn as sns
 import skimage.io as io
@@ -2908,69 +2908,136 @@ def plot_prop(mdata, niche_list, save_directory, filename_save):
     plt.tight_layout()
     plt.savefig(os.path.join(save_directory, filename_save+'.pdf'), bbox_inches = 'tight')
 
-def compute_abundance(adata, patient_key, cell_type_key, outcome_key, outcome_dict, id1, id2):
+def compute_abundance(
+    adata,
+    patient_key,
+    cell_type_key,
+    outcome_key,
+    outcome_dict,
+    outcome_type='binary',
+    id1=None,
+    id2=None):
+
     counts = adata.obs.groupby([patient_key, cell_type_key]).size().unstack().copy()
     norm_counts = counts.div(counts.sum(axis=1), axis=0).reset_index()
     norm_counts[outcome_key] = pd.Series(norm_counts[patient_key]).map(outcome_dict)
-
     cell_type_columns = counts.columns
-    results = {cell_type_key: [], 'p_value': [], 'Log2FC': []}
     
-    for cell_type in cell_type_columns:
-        group1 = norm_counts[norm_counts[outcome_key] == id1][cell_type]
-        group2 = norm_counts[norm_counts[outcome_key] == id2][cell_type]
-
-        mean_group1 = group1.mean()
-        mean_group2 = group2.mean()
-        if mean_group2 > 0:
-            log2fc = np.log2((mean_group1 + 1e-10) / (mean_group2 + 1e-10))
-        else:
-            log2fc = np.nan    
-        
-        results['Log2FC'].append(log2fc)
-        
-        if len(group1.unique()) > 1 and len(group2.unique()) > 1:
+    results = {cell_type_key: [],
+        'p_value': [],
+        'stat_value': [],
+        'Log2FC': []}
+    
+    if outcome_type == 'binary':
+        for cell_type in cell_type_columns:
+            group1 = norm_counts[norm_counts[outcome_key] == id1][cell_type]
+            group2 = norm_counts[norm_counts[outcome_key] == id2][cell_type]
+            mean_group1 = group1.mean()
+            mean_group2 = group2.mean()
+            if (mean_group1 > 0) or (mean_group2 > 0):
+                log2fc = np.log2((mean_group1 + 1e-10) / (mean_group2 + 1e-10))
+            else:
+                log2fc = np.nan
             try:
-                _, p_value = ranksums(group1, group2)
-                results[cell_type_key].append(cell_type)
-                results['p_value'].append(p_value)
+                stat_val, p_value = ranksums(group1, group2)
             except ValueError:
-                results[cell_type_key].append(cell_type)
-                results['p_value'].append(np.nan)
-        else:
+                stat_val, p_value = np.nan, np.nan
             results[cell_type_key].append(cell_type)
-            results['p_value'].append(np.nan)
-    p_values_df = pd.DataFrame(results)
-    fdr_corrected = multipletests(results['p_value'], method='fdr_bh')[1]
-    p_values_df['FDR_p_value'] = fdr_corrected
-    p_values_df['-log10(Adj. p-value)'] = -1*np.log10(fdr_corrected)
-    return norm_counts, p_values_df
+            results['p_value'].append(p_value)
+            results['stat_value'].append(stat_val)  # store the z-statistic
+            results['Log2FC'].append(log2fc)
+    
+    elif outcome_type == 'continuous':
+        for cell_type in cell_type_columns:
+            x = norm_counts[cell_type]
+            y = norm_counts[outcome_key]
 
-def plot_cell_type_abundance_grid(norm_counts, p_values_df, outcome_key, cell_type_key, fdr_column='FDR_p_value', threshold = 0.05, order = [0, 1], save_directory = 'figures', filename_save = 'boxplot'):
+            valid_mask = ~x.isna() & ~y.isna()
+            if valid_mask.sum() < 3:
+                # Not enough data points for a correlation
+                rho, p_value = np.nan, np.nan
+            else:
+                rho, p_value = spearmanr(x[valid_mask], y[valid_mask])
+            log2fc = np.nan
+            results[cell_type_key].append(cell_type)
+            results['p_value'].append(p_value)
+            results['stat_value'].append(rho)
+            results['Log2FC'].append(log2fc)
+
+    pvals = results['p_value']
+    fdr_corrected = multipletests(pvals, method='fdr_bh')[1]
+    results_df = pd.DataFrame({cell_type_key: results[cell_type_key],
+        'p_value': results['p_value'],
+        'stat_value': results['stat_value'],
+        'Log2FC': results['Log2FC'],
+        'FDR_p_value': fdr_corrected,
+        '-log10(Adj. p-value)': -np.log10(fdr_corrected)})
+    return norm_counts, results_df
+
+def plot_cell_type_abundance_grid(
+    norm_counts,
+    p_values_df,
+    outcome_key,
+    cell_type_key,
+    outcome_type='binary',
+    fdr_column='FDR_p_value',
+    threshold=0.05,
+    order=None,
+    save_directory='figures',
+    filename_save='plot',
+    n_cols=7):
     cell_types = p_values_df[cell_type_key].tolist()
     fdr_p_values = p_values_df[fdr_column].tolist()
     n_cell_types = len(cell_types)
-    n_cols = 7 
     n_rows = (n_cell_types + n_cols - 1) // n_cols
-
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, n_rows * 2.5))
+    stat_values = p_values_df['stat_value'].tolist()
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(20, n_rows * 3))
     axes = axes.flatten()
-    for i, (cell_type, fdr_p_value) in enumerate(zip(cell_types, fdr_p_values)):
+    for i, (cell_type, fdr_p_value, stat_val) in enumerate(zip(cell_types, fdr_p_values, stat_values)):
         ax = axes[i]
-        g = sns.boxplot(data=norm_counts, x=outcome_key, y=cell_type, ax=ax, width = 0.5, palette="Set2", fliersize=0, order=order)
-        g = sns.stripplot(data=norm_counts, x=outcome_key, y=cell_type, ax=ax, palette="Set2", linewidth=0.2, edgecolor='gray', order=order)
-        g.tick_params(labelsize=10)
-        ax.set_title(f"{cell_type}", fontsize = 12)
-        ax.set_xlabel("Outcome", fontsize = 12)
-        ax.set_ylabel("Normalized abundance", fontsize = 12)
-        fdr_text = f"FDR={fdr_p_value:.2g}"
-        ax.text(0.75, 0.9, fdr_text,
-            ha='center', va='center', transform=ax.transAxes,
-            fontsize=10, color="red" if fdr_p_value >= -1*np.log10(threshold) else "black")
+        if outcome_type == 'binary':
+            sns.boxplot(data=norm_counts, x=outcome_key, y=cell_type,
+                ax=ax, width=0.5, palette="Set2", fliersize=0,
+                order=order)
+            sns.stripplot(data=norm_counts, x=outcome_key, y=cell_type,
+                ax=ax, palette="Set2", linewidth=0.2,
+                edgecolor='gray', order=order)
+            ax.set_xlabel("Outcome", fontsize=11)
+            ax.set_ylabel("Frequency", fontsize=11)
+            ax.set_title(f"{cell_type}", fontsize=12)
+            fdr_text = f"FDR={fdr_p_value:.2g}"
+            color = "red" if fdr_p_value < threshold else "black"
+            ax.text(0.5, 0.9, f"{fdr_text}",
+                ha='center', va='center', transform=ax.transAxes,
+                fontsize=10, color=color,
+                bbox=dict(facecolor='white', alpha=0.6, edgecolor='none'))
+        
+        elif outcome_type == 'continuous':
+            sns.regplot(data=norm_counts,
+                x=outcome_key,
+                y=cell_type,
+                ax=ax,
+                scatter_kws={'alpha': 0.5, 'color': 'black', 's': 20},
+                line_kws={'color': 'red'})
+            ax.set_xlabel(f"Outcome", fontsize=11)
+            ax.set_ylabel("Frequency", fontsize=11)
+            ax.set_title(f"{cell_type}", fontsize=12)
+            fdr_text = f"FDR={fdr_p_value:.2g}"
+            stat_text  = f"ρ={stat_val:.2f}" if not pd.isna(stat_val) else "ρ=NA"
+            color = "red" if fdr_p_value < threshold else "black"
+            ax.text(0.5, 0.9, f"{fdr_text}\n{stat_text}",
+                ha='center', va='center', transform=ax.transAxes,
+                fontsize=10, color=color,
+                bbox=dict(facecolor='white', alpha=0.6, edgecolor='none'))
+
     for j in range(i + 1, len(axes)):
         fig.delaxes(axes[j])
+
     plt.tight_layout()
-    plt.savefig(os.path.join(save_directory, filename_save+'.pdf'), bbox_inches = 'tight', dpi = 400)
+    os.makedirs(save_directory, exist_ok=True)
+    plt.savefig(os.path.join(save_directory, f"{filename_save}.pdf"),
+        bbox_inches='tight', dpi=400)
+    plt.show()
 
 def plot_auc(auc_score, save_directory = 'figures', filename_save = 'auc'):
     sns.set_style('ticks')

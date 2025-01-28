@@ -1,0 +1,14 @@
+README.md
+setup.py
+sotip/DMA.py
+sotip/MED.py
+sotip/__init__.py
+sotip/merge_cls.py
+sotip/my_plot.py
+sotip/utils.py
+sotip/voronoi.py
+sotip.egg-info/PKG-INFO
+sotip.egg-info/SOURCES.txt
+sotip.egg-info/dependency_links.txt
+sotip.egg-info/requires.txt
+sotip.egg-info/top_level.txt

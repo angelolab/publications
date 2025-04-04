@@ -3,11 +3,12 @@ library(caret)
 library(pROC)
 library(dplyr)
 library(splitTools)
-setwd("~/Documents/Angelo_lab/quiche")
+# setwd("~/Users/jolene/Documents/publications/2024-Ranek_etal_QUICHE")
 source("utils.R")
 datasets <- list(list(data = read.csv('data/output_files/normalized_cell_abundances_spain.csv'), outcome = "Relapse", positive = 1.0, name = "spain"),
             list(data = read.csv('data/output_files/normalized_cell_abundances_stanford.csv'), outcome = "Recurrence", positive = "POSITIVE", name = "stanford"),
-            list(data = read.csv('data/output_files/normalized_cell_abundances_nt.csv'), outcome = "pCR", positive = "RD", name = "nt"))
+            list(data = read.csv('data/output_files/normalized_cell_abundances_nt.csv'), outcome = "pCR", positive = "RD", name = "nt"),
+            list(data = read.csv('data/output_files/normalized_cell_abundances_nt_metacluster.csv'), outcome = "pCR", positive = "RD", name = "nt_metacluster"))
 
 compute_auc <- function(df, outcome_col, positive_class, seed_seq, nfolds = 5) {
   #preprocess

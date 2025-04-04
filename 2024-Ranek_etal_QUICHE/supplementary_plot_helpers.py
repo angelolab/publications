@@ -2679,18 +2679,20 @@ def boxplot(mdata,
 
     y_ticks = ax0.get_yticks()
     y_tick_labels = [tick.get_text() for tick in ax0.get_yticklabels()]
-    ax0.set_yticklabels(y_tick_labels, fontsize=fontsize, ha='right', position=(-0.035, 0))
 
-    ellipse_size = 0.4
+    if colors_dict is not None:
+        ax0.set_yticklabels(y_tick_labels, fontsize=fontsize, ha='right', position=(-0.035, 0))
 
-    for y, cell_type in zip(y_ticks, y_tick_labels):
-        if cell_type in colors_dict:
-            color = colors_dict[cell_type]
-            ellipse = Ellipse(
-                (circle_x, y), width=circle_width, height=ellipse_size, color=color, transform=ax0.transData,
-                clip_on=False, zorder=10
-            )
-            ax0.add_patch(ellipse)
+        ellipse_size = 0.4
+
+        for y, cell_type in zip(y_ticks, y_tick_labels):
+            if cell_type in colors_dict:
+                color = colors_dict[cell_type]
+                ellipse = Ellipse(
+                    (circle_x, y), width=circle_width, height=ellipse_size, color=color, transform=ax0.transData,
+                    clip_on=False, zorder=10
+                )
+                ax0.add_patch(ellipse)
 
     plt.tick_params(labelsize=fontsize)
 
@@ -3049,5 +3051,5 @@ def plot_auc(auc_score, save_directory = 'figures', filename_save = 'auc'):
     g.tick_params(labelsize=14)
     g.set_xlabel('', fontsize = 16)
     g.set_ylabel('AUC', fontsize = 16)
-    plt.ylim(0, 1.0)
+    plt.ylim(0.4, 0.7)
     plt.savefig(os.path.join(save_directory, filename_save+'.pdf'), bbox_inches = 'tight')

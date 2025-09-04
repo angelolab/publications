@@ -1,110 +1,70 @@
+import os
+import numpy as np
+import pandas as pd
 import matplotlib
+
+from python_files.utils import compare_timepoints
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 
-import numpy as np
-import os
-import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 
 BASE_DIR = "/Volumes/Shared/Noah Greenwald/TONIC_Cohort/"
 SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
+ANALYSIS_DIR = os.path.join(BASE_DIR, "analysis_files")
+
+## 3.5 Baseline to On-nivo feature evolution ##
+
+baseline_on_nivo_viz_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10')
+harmonized_metadata = pd.read_csv(os.path.join(ANALYSIS_DIR, 'harmonized_metadata.csv'))
+timepoint_features = pd.read_csv(os.path.join(ANALYSIS_DIR, 'timepoint_features_filtered.csv'))
+timepoint_features = timepoint_features.merge(harmonized_metadata[['Patient_ID', 'Tissue_ID', 'Timepoint', 'baseline__on_nivo']].drop_duplicates(), on='Tissue_ID')
+feature_subset = timepoint_features.loc[(timepoint_features.baseline__on_nivo) & (timepoint_features.Timepoint.isin(['baseline', 'on_nivo'])), :]
+
+def summarize_timepoint_enrichment(input_df, feature_df, timepoints, output_dir, pval_thresh=2,
+                                   diff_thresh=0.3, plot_type='strip', sort_by='mean_diff'):
+    """Generate a summary of the timepoint enrichment results
+
+    Args:
+        input_df (pd.DataFrame): dataframe containing timepoint enrichment results
+        feature_df (pd.DataFrame): dataframe containing feature information
+        timepoints (list): list of timepoints to include
+        output_dir (str): path to output directory
+        pval_thresh (float): threshold for p-value
+        diff_thresh (float): threshold for difference between timepoints
+    """
+
+    input_df_filtered = input_df.loc[(input_df.log_pval > pval_thresh) & (np.abs(input_df[sort_by]) > diff_thresh), :]
+
+    input_df_filtered = input_df_filtered.sort_values(sort_by, ascending=False)
+
+    # plot the results
+    for idx, feature in enumerate(input_df_filtered.feature_name_unique):
+        feature_subset = feature_df.loc[(feature_df.feature_name_unique == feature), :]
+        feature_subset = feature_subset.loc[(feature_subset.Timepoint.isin(timepoints)), :]
+
+        g = sns.catplot(data=feature_subset, x='Timepoint', y='raw_mean', kind=plot_type, color='grey')
+        g.fig.suptitle(feature)
+        g.savefig(os.path.join(output_dir, 'Evolution_{}_{}.pdf'.format(idx, feature)))
+        plt.close()
+
+    sns.catplot(data=input_df_filtered, x=sort_by, y='feature_name_unique', kind='bar', color='grey')
+    plt.savefig(os.path.join(output_dir, 'Timepoint_summary.pdf'))
+    plt.close()
 
 
-ranked_features_all = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
-ranked_features = ranked_features_all.loc[ranked_features_all.comparison.isin(['primary', 'baseline', 'pre_nivo', 'on_nivo'])]
-ranked_features = ranked_features.loc[ranked_features.feature_rank_global <= 100, :]
+for paired_status in ['baseline__on_nivo', None]:
+    subdir_name = 'paired' if paired_status else 'unpaired'
+    subdir_path = os.path.join(baseline_on_nivo_viz_dir, subdir_name)
+    os.makedirs(subdir_path)
 
-# densities vs ratios in top 100
-ranked_features = ranked_features.loc[ranked_features.feature_type.isin(['density', 'density_ratio', 'density_proportion']), :]
-ranked_features['feature_type'] = ranked_features['feature_type'].replace('density_proportion', 'density_ratio')
-ranked_features = ranked_features[['feature_name_unique', 'feature_type']]
+    primary_met_means = compare_timepoints(
+        feature_df=timepoint_features, timepoint_1_name='baseline', timepoint_1_list=['baseline'],
+        timepoint_2_name='on_nivo', timepoint_2_list=['on_nivo'], paired=paired_status, feature_suff='mean')
 
-ranked_feature_counts = ranked_features.groupby('feature_type').count().reset_index()
-
-# plot
-fig, ax = plt.subplots(1, 1, figsize=(2, 4))
-sns.barplot(data=ranked_feature_counts, x='feature_type', y='feature_name_unique', color='grey', ax=ax)
-sns.despine()
-plt.xlabel('Feature Type')
-plt.ylabel('Number of Features')
-ax.set_ylim([0, 45])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10a.pdf'), dpi=300)
-plt.close()
-
-
-# volcano plot for RNA features
-ranked_features_df = pd.read_csv(os.path.join(BASE_DIR, 'sequencing_data/genomics_outcome_ranking.csv'))
-ranked_features_df = ranked_features_df.loc[ranked_features_df.data_type == 'RNA', :]
-ranked_features_df = ranked_features_df.sort_values(by='combined_rank', ascending=True)
-
-ranked_features_df[['feature_name_unique']].to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10c.csv'), index=False)
-
-# plot  volcano
-fig, ax = plt.subplots(figsize=(3,3))
-sns.scatterplot(data=ranked_features_df, x='med_diff', y='log_pval', alpha=1, hue='importance_score',
-                palette=sns.color_palette("icefire", as_cmap=True),
-                s=2.5, edgecolor='none', ax=ax)
-ax.set_xlim(-3, 3)
-ax.set_ylim(0, 7)
-sns.despine()
-
-# add gradient legend
-norm = plt.Normalize(ranked_features_df.importance_score.min(), ranked_features_df.importance_score.max())
-sm = plt.cm.ScalarMappable(cmap="icefire", norm=norm)
-ax.get_legend().remove()
-ax.figure.colorbar(sm, ax=ax)
-plt.tight_layout()
-
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10b.pdf'))
-plt.close()
-
-# by comparison
-top_features = ranked_features_df.iloc[:100, :]
-
-top_features_by_comparison = top_features[['data_type', 'comparison']].groupby(['comparison']).size().reset_index()
-top_features_by_comparison.columns = ['comparison', 'num_features']
-top_features_by_comparison = top_features_by_comparison.sort_values('num_features', ascending=False)
-
-fig, ax = plt.subplots(figsize=(4, 4))
-sns.barplot(data=top_features_by_comparison, x='comparison', y='num_features', color='grey', ax=ax)
-plt.xticks(rotation=90)
-plt.tight_layout()
-sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10e.pdf'))
-plt.close()
-
-# by data type
-ranked_features_df = pd.read_csv(os.path.join(BASE_DIR, 'sequencing_data/genomics_outcome_ranking.csv'))
-top_features = ranked_features_df.iloc[:100, :]
-
-top_features_by_data_type = top_features[['data_type', 'comparison']].groupby(['data_type']).size().reset_index()
-top_features_by_data_type.columns = ['data_type', 'num_features']
-top_features_by_data_type = top_features_by_data_type.sort_values('num_features', ascending=False)
-
-fig, ax = plt.subplots(figsize=(4, 4))
-sns.barplot(data=top_features_by_data_type, x='data_type', y='num_features', color='grey', ax=ax)
-plt.xticks(rotation=90)
-plt.tight_layout()
-sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10d.pdf'))
-plt.close()
-
-
-# summarize overlap of top features
-ranked_features = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
-top_features = ranked_features.loc[ranked_features.comparison.isin(['primary', 'baseline', 'pre_nivo', 'on_nivo']), :]
-top_features = top_features.iloc[:100, :]
-top_features_by_feature = top_features[['feature_name_unique', 'comparison']].groupby('feature_name_unique').count().reset_index()
-feature_counts = top_features_by_feature.groupby('comparison').count().reset_index()
-feature_counts.columns = ['num_comparisons', 'num_features']
-
-fig, ax = plt.subplots(figsize=(4, 4))
-ax.set_ylim(0, 90)
-sns.barplot(data=feature_counts, x='num_comparisons', y='num_features', color='grey', ax=ax)
-plt.tight_layout()
-sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10f.pdf'))
-plt.close()
+    summarize_timepoint_enrichment(input_df=primary_met_means, feature_df=timepoint_features,
+                                   timepoints=['baseline', 'on_nivo'],
+                                   pval_thresh=2, diff_thresh=0.3, output_dir=os.path.join(baseline_on_nivo_viz_dir, subdir_name))

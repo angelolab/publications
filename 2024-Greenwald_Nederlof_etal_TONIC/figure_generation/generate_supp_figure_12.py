@@ -8,113 +8,185 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from matplotlib_venn import venn3
+from matplotlib_venn import venn2
+from python_files.supplementary_plot_helpers import random_feature_generation, calculate_feature_corr
 
 
 BASE_DIR = "/Volumes/Shared/Noah Greenwald/TONIC_Cohort/"
 SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
-all_model_rankings = pd.read_csv(os.path.join(BASE_DIR, 'multivariate_lasso/intermediate_results', 'all_model_rankings.csv'))
 
-# plot top features
-all_model_plot = all_model_rankings.loc[all_model_rankings.timepoint != 'primary', :]
-sns.stripplot(data=all_model_plot.loc[all_model_plot.top_ranked, :], x='timepoint', y='importance_score', hue='modality',
-              order=['baseline', 'pre_nivo', 'on_nivo'])
-plt.title('Top ranked features')
-plt.ylim([0, 1.05])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12d.pdf'))
-plt.close()
+# Analyse the significance scores of top features after randomization compared to the TONIC data.
+fp_dir = os.path.join(BASE_DIR, "supplementary_figs", 'supp_figure_12a_files')
 
-# plot number of times features are selected
-sns.histplot(data=all_model_rankings.loc[all_model_rankings.top_ranked, :], x='count', color='grey', multiple='stack',
-             binrange=(1, 10), discrete=True)
-plt.title('Number of times features are selected')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12b.pdf'))
-plt.close()
-
-# plot venn diagram
-rna_rankings_top = all_model_rankings.loc[np.logical_and(all_model_rankings.modality == 'RNA', all_model_rankings.top_ranked), :]
-rna_baseline = rna_rankings_top.loc[rna_rankings_top.timepoint == 'baseline', 'feature_name_unique'].values
-rna_nivo = rna_rankings_top.loc[rna_rankings_top.timepoint == 'on_nivo', 'feature_name_unique'].values
-rna_induction = rna_rankings_top.loc[rna_rankings_top.timepoint == 'pre_nivo', 'feature_name_unique'].values
-
-venn3([set(rna_baseline), set(rna_nivo), set(rna_induction)], ('Baseline', 'Nivo', 'Induction'))
-plt.title('RNA top ranked features')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12f.pdf'))
-plt.close()
-
-# top ranked features from each timepoint
-mibi_rankings_top = all_model_rankings.loc[np.logical_and(all_model_rankings.modality == 'MIBI', all_model_rankings.top_ranked), :]
-mibi_baseline = mibi_rankings_top.loc[mibi_rankings_top.timepoint == 'baseline', 'feature_name_unique'].values
-mibi_nivo = mibi_rankings_top.loc[mibi_rankings_top.timepoint == 'on_nivo', 'feature_name_unique'].values
-mibi_induction = mibi_rankings_top.loc[mibi_rankings_top.timepoint == 'pre_nivo', 'feature_name_unique'].values
-
-venn3([set(mibi_baseline), set(mibi_nivo), set(mibi_induction)], ('Baseline', 'Nivo', 'Induction'))
-plt.title('MIBI top ranked features')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12e.pdf'))
-plt.close()
-
-# compare correlations between top ranked features
-ranked_features_univariate = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
-
-nivo_features_model = all_model_rankings.loc[np.logical_and(all_model_rankings.timepoint == 'on_nivo', all_model_rankings.top_ranked), :]
-nivo_features_model = nivo_features_model.loc[nivo_features_model.modality == 'MIBI', 'feature_name_unique'].values
-
-nivo_features_univariate = ranked_features_univariate.loc[np.logical_and(ranked_features_univariate.comparison == 'on_nivo',
-                                                                         ranked_features_univariate.feature_rank_global <= 100), :]
-
-timepoint_features = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/timepoint_combined_features.csv'))
-timepoint_features = timepoint_features.loc[timepoint_features.Timepoint == 'on_nivo', :]
-
-timepoint_features_model = timepoint_features.loc[timepoint_features.feature_name_unique.isin(nivo_features_model), :]
-timepoint_features_model = timepoint_features_model[['feature_name_unique', 'normalized_mean', 'Patient_ID']]
-timepoint_features_model = timepoint_features_model.pivot(index='Patient_ID', columns='feature_name_unique', values='normalized_mean')
-
-# get values
-model_corr = timepoint_features_model.corr()
-model_corr = model_corr.where(np.triu(np.ones(model_corr.shape), k=1).astype(np.bool)).values.flatten()
-model_corr = model_corr[~np.isnan(model_corr)]
-
-# get univariate features
-timepoint_features_univariate = timepoint_features.loc[timepoint_features.feature_name_unique.isin(nivo_features_univariate.feature_name_unique), :]
-timepoint_features_univariate = timepoint_features_univariate[['feature_name_unique', 'normalized_mean', 'Patient_ID']]
-timepoint_features_univariate = timepoint_features_univariate.pivot(index='Patient_ID', columns='feature_name_unique', values='normalized_mean')
-
-# get values
-univariate_corr = timepoint_features_univariate.corr()
-univariate_corr = univariate_corr.where(np.triu(np.ones(univariate_corr.shape), k=1).astype(np.bool)).values.flatten()
-univariate_corr = univariate_corr[~np.isnan(univariate_corr)]
-
-corr_values = pd.DataFrame({'correlation': np.concatenate([model_corr, univariate_corr]),
-                            'model': ['model'] * len(model_corr) + ['univariate'] * len(univariate_corr)})
-
-# plot correlations by model
-fig, ax = plt.subplots(1, 1, figsize=(3, 4))
-sns.boxplot(data=corr_values, x='model', y='correlation',
-            color='grey', ax=ax, showfliers=False)
-
-ax.set_title('Feature correlation')
-sns.despine()
-plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12c.pdf'))
-plt.close()
-
-# look at interesting features
+'''
+# compute random feature sets
 combined_df = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/timepoint_combined_features.csv'))
+feature_df = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
+feature_metadata = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_metadata.csv'))
 
-for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
+repeated_features, repeated_features_num, scores = [], [], []
+overlapping_features, random_top_features = [], []
 
-    plot_df = combined_df.loc[(combined_df.feature_name_unique == 'CD38+__all') &
-                              (combined_df.Timepoint == timepoint), :]
+sample_num = 100
+np.random.seed(13)
 
-    fig, ax = plt.subplots(1, 1, figsize=(2, 4))
-    sns.stripplot(data=plot_df, x='Clinical_benefit', y='raw_mean', order=['Yes', 'No'],
-                    color='black', ax=ax)
-    sns.boxplot(data=plot_df, x='Clinical_benefit', y='raw_mean', order=['Yes', 'No'],
-                    color='grey', ax=ax, showfliers=False, width=0.3)
-    ax.set_title('CD38+ ' + timepoint)
-    ax.set_ylim([0, 0.5])
+for i, seed in enumerate(random.sample(range(1, 2000), sample_num)):
+    print(f'{i+1}/100')
+    intersection_of_features, jaccard_score, top_random_features = random_feature_generation(combined_df, seed, feature_df[:100], feature_metadata)
+
+    shared_df = pd.DataFrame({
+        'random_seed': [seed] * len(intersection_of_features),
+        'repeated_features' : list(intersection_of_features),
+        'jaccard_score': [jaccard_score] * len(intersection_of_features)
+    })
+    overlapping_features.append(shared_df)
+
+    top_random_features['seed'] = seed
+    random_top_features.append(top_random_features)
+
+results = pd.concat(overlapping_features)
+top_features = pd.concat(random_top_features)
+# add TONIC features to data with seed 0
+top_features = pd.concat([top_features, feature_df[:100]])
+top_features['seed'] = top_features['seed'].fillna(0)
+
+results.to_csv(os.path.join(fp_dir, 'overlapping_features.csv'), index=False)
+top_features.to_csv(os.path.join(fp_dir, 'top_features.csv'), index=False)
+'''
+
+top_features = pd.read_csv(os.path.join(fp_dir, 'top_features.csv'))
+results = pd.read_csv(os.path.join(fp_dir, 'overlapping_features.csv'))
+
+avg_scores = top_features[['seed', 'pval', 'log_pval', 'fdr_pval', 'med_diff']].groupby(by='seed').mean()
+avg_scores['abs_med_diff'] = abs(avg_scores['med_diff'])
+top_features['abs_med_diff'] = abs(top_features['med_diff'])
+
+# log p-value & effect size plots
+for name, metric in zip(['supp_figure_12a', 'supp_figure_12c'], ['log_pval', 'abs_med_diff']):
+    # plot metric dist in top features for TONIC data and one random set
+    TONIC = top_features[top_features.seed == 0]
+    random = top_features[top_features.seed == 228]
+    g = sns.distplot(TONIC[metric], kde=True, color='#1f77b4')
+    g = sns.distplot(random[metric], kde=True, color='#ff7f0e')
+    g.set(xlim=(0, None))
+    plt.xlabel(metric)
+    plt.title(f"{metric} Distribution in TONIC vs a Random")
+    g.legend(labels=["TONIC", "Randomized"])
+    sns.move_legend(g, "upper left", bbox_to_anchor=(0.9, 1))
     sns.despine()
     plt.tight_layout()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'CD38_positivity in {}.pdf'.format(timepoint)))
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, f"{name}.pdf"), dpi=300)
+    plt.show()
     plt.close()
+
+for name, metric in zip(['supp_figure_12b', 'supp_figure_12d'], ['log_pval', 'abs_med_diff']):
+    # plot average metric across top features for each set
+    g = sns.distplot(avg_scores[metric][1:], kde=True,  color='#ff7f0e')
+    g.axvline(x=avg_scores[metric][0], color='#1f77b4')
+    g.set(xlim=(0, avg_scores[metric][0]*1.2))
+    plt.xlabel(f'Average {metric} of Top 100 Features')
+    plt.title(f"Average {metric} in TONIC vs Random Sets")
+    g.legend(labels=["Randomized", "TONIC"])
+    sns.move_legend(g, "upper left", bbox_to_anchor=(0.9, 1))
+    sns.despine()
+    plt.tight_layout()
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, f"{name}.pdf"), dpi=300)
+    plt.show()
+    plt.close()
+
+# # general feature overlap plots
+# high_features = results.groupby(by='repeated_features').count().sort_values(by='random_seed', ascending=False).reset_index()
+# high_features = high_features[high_features.random_seed>3].sort_values(by='random_seed')
+# plt.barh(high_features.repeated_features, high_features.random_seed)
+# plt.xlabel('How Many Random Sets Contain the Feature')
+# plt.title('Repeated Top Features')
+# sns.despine()
+# plt.savefig(os.path.join(fp_dir, "Repeated_Top_Features.pdf"), dpi=300, bbox_inches='tight')
+# plt.show()
+
+repeated_features_num = results.groupby(by='random_seed').count().sort_values(by='repeated_features', ascending=False)
+plt.hist(repeated_features_num.repeated_features)
+plt.xlabel('Number of TONIC Top Features in each Random Set')
+plt.title('Histogram of Overlapping Features')
+sns.despine()
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, f"supp_figure_12e.pdf"), dpi=300)
+plt.show()
+plt.close()
+
+# plt.hist(results.jaccard_score, bins=10)
+# plt.xlim((0, 0.10))
+# plt.title('Histogram of Jaccard Scores')
+# sns.despine()
+# plt.xlabel('Jaccard Score')
+# plt.savefig(os.path.join(fp_dir, "Histogram_of_Jaccard_Scores.pdf"), dpi=300)
+# plt.show()
+
+# compute the correlation between response-associated features
+timepoint_features = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/timepoint_combined_features.csv'))
+feature_ranking_df = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
+feature_ranking_df = feature_ranking_df[np.isin(feature_ranking_df['comparison'], ['primary', 'baseline', 'pre_nivo' , 'on_nivo'])]
+feature_ranking_df = feature_ranking_df.sort_values(by = 'feature_rank_global', ascending=True)
+
+top_features = feature_ranking_df.iloc[:100, :].loc[:, ['feature_name_unique', 'comparison', 'feature_type']]
+top_features.columns = ['feature_name_unique', 'Timepoint', 'feature_type']
+
+remaining_features = feature_ranking_df.iloc[100:, :].loc[:, ['feature_name_unique', 'comparison', 'feature_type']]
+remaining_features.columns = ['feature_name_unique', 'Timepoint', 'feature_type']
+
+
+#C(100, 2) = 100! / [(100-2)! * 2!] = 4950 unique pairwise combinations top 100 features and each other
+corr_within = calculate_feature_corr(timepoint_features, top_features, remaining_features, top=True)
+corr_across = calculate_feature_corr(timepoint_features, top_features, remaining_features, top=False)
+
+corr_across = corr_across[~np.isnan(corr_across)]
+corr_within = corr_within[~np.isnan(corr_within)]
+
+_, axes = plt.subplots(1, 1, figsize = (5, 4), gridspec_kw={'hspace': 0.45, 'wspace': 0.4, 'bottom':0.15})
+g = sns.histplot(corr_within, color='#2089D5', ax = axes, kde = True, bins = 50, label = 'top-top', alpha = 0.5)
+g = sns.histplot(corr_across, color='lightgrey', ax = axes, kde = True, bins = 50, label = 'top-remaining', alpha = 0.5)
+g.tick_params(labelsize=12)
+g.set_ylabel('number of comparisons', fontsize = 12)
+g.set_xlabel('abs(correlation)', fontsize = 12)
+plt.legend(prop={'size':9})
+g.set_xlim(0, 1)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12f.pdf'), bbox_inches = 'tight', dpi = 300)
+plt.close()
+
+# get overlap between static and evolution top features
+ranked_features = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/feature_ranking.csv'))
+
+overlap_type_dict = {'global': [['primary', 'baseline', 'pre_nivo', 'on_nivo'],
+                                ['primary__baseline', 'baseline__pre_nivo', 'baseline__on_nivo', 'pre_nivo__on_nivo']],
+                     'primary': [['primary'], ['primary__baseline']],
+                     'baseline': [['baseline'], ['primary__baseline', 'baseline__pre_nivo', 'baseline__on_nivo']],
+                     'pre_nivo': [['pre_nivo'], ['baseline__pre_nivo', 'pre_nivo__on_nivo']],
+                     'on_nivo': [['on_nivo'], ['baseline__on_nivo', 'pre_nivo__on_nivo']]}
+
+overlap_results = {}
+for overlap_type, comparisons in overlap_type_dict.items():
+    static_comparisons, evolution_comparisons = comparisons
+
+    overlap_top_features = ranked_features.copy()
+    overlap_top_features = overlap_top_features.loc[overlap_top_features.comparison.isin(static_comparisons + evolution_comparisons)]
+    overlap_top_features.loc[overlap_top_features.comparison.isin(static_comparisons), 'comparison'] = 'static'
+    overlap_top_features.loc[overlap_top_features.comparison.isin(evolution_comparisons), 'comparison'] = 'evolution'
+    overlap_top_features = overlap_top_features[['feature_name_unique', 'comparison']].drop_duplicates()
+    overlap_top_features = overlap_top_features.iloc[:100, :]
+    # keep_features = overlap_top_features.feature_name_unique.unique()[:100]
+    # overlap_top_features = overlap_top_features.loc[overlap_top_features.feature_name_unique.isin(keep_features), :]
+    # len(overlap_top_features.feature_name_unique.unique())
+    static_ids = overlap_top_features.loc[
+        overlap_top_features.comparison == 'static', 'feature_name_unique'].unique()
+    evolution_ids = overlap_top_features.loc[
+        overlap_top_features.comparison == 'evolution', 'feature_name_unique'].unique()
+
+    overlap_results[overlap_type] = {'static_ids': static_ids, 'evolution_ids': evolution_ids}
+
+
+# get counts of features in each category
+static_ids = overlap_results['global']['static_ids']
+evolution_ids = overlap_results['global']['evolution_ids']
+venn2([set(static_ids), set(evolution_ids)], set_labels=('Static', 'Evolution'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12g.pdf'))
+plt.close()

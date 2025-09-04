@@ -51,21 +51,27 @@ mibi_rankings = all_model_rankings.loc[np.logical_and(all_model_rankings.modalit
                                        all_model_rankings.timepoint == 'on_nivo'), :]
 
 # annotate required channels per feature
-channels_reqs = {
-    'Cancer_3__proportion_of__Cancer': ['ECAD', 'CK17', 'H3K27'],
-    'T_Other__cell_cluster_density__cancer_border': ['CD3', 'CD4', 'CD8', 'CD45'],
-    'Fe+__all': ['Fe'],
-    'B__Structural__ratio__cancer_border': ['CD20', 'Collagen', 'Fibronectin', 'FAP', 'SMA'],
-    'Smooth_Muscle__cell_cluster_density': ['SMA'],
-    'NK__Structural__ratio__cancer_core': ['CD56'],
-    'TCF1+__Cancer_1': ['TCF1'],
-    'Cancer_diversity': ['ECAD',],
-    'B__Cancer__ratio': ['CD20', 'ECAD', 'CK17'],
-    'APC__cell_cluster_density__cancer_border': ['CD11c', 'HLA-DR'],
-    'Endothelium__cell_cluster_density__cancer_border': ['CD31'],
-    'Ki67+__Cancer_2__stroma_core': ['Ki67'],
-    'cluster_2__proportion': ['FOXP3', 'CD14', 'CD68', 'CD163', 'ChyTr', 'Calprotectin']
-}
+channels_reqs = {'T_Other__cluster_density__cancer_border': ['CD3', 'CD4', 'CD8', 'CD45', 'ECAD', 'H3K27', 'H3K9'],
+                 'CD45RO+__Immune_Other__cancer_border': ['CD45', 'CD3', 'CD4', 'CD8', 'CD14', 'CD20', 'CD56', 'CD68', 'CD163', 'CD11c', 'HLADR'],
+                 'Cancer_3__proportion_of__Cancer': ['ECAD', 'CK17'],
+                 'NK__Structural__ratio__cancer_border': ['CD56', 'Collagen', 'Fibronectin', 'FAP', 'ECAD', 'CK17', 'SMA'],
+                 'B__Cancer__ratio': ['CD20', 'ECAD', 'CK17'],
+                 'cluster_5__proportion': ['CD31', 'FOXP3', 'ChyTr', 'Calprotectin'],
+                 'Fe+__all': ['Fe'],
+                 'CD45RO+__Other': ['CD45RO'],
+                 'Smooth_Muscle__proportion_of__Structural': ['SMA'],
+                 'B__Structural__ratio__cancer_border': ['B'],
+                 'Endothelium__cluster_density__cancer_border':['CD31'],
+                 'TCF1+__Cancer_1': ['TCF1'],
+                 'T__Cancer__ratio__cancer_border': ['CD3'],
+                 'Smooth_Muscle__cluster_density': ['SMA'],
+                 'Mono_Mac__Cancer__ratio__cancer_border': ['CD14'],
+                 'cancer_diversity_stroma_core': ['ECAD', 'CK17'],
+                 'HLADR+__Immune_Other__cancer_border': ['HLADR'],
+                 'Ki67+__Cancer_2__stroma_core': ['Ki67'],
+                 'NK__Structural__ratio__cancer_core': ['CD56'],
+                 'num_concavities_nuclear__Cancer_1': ['ECAD'],
+                 }
 
 channel_counts = mibi_rankings[['feature_name_unique', 'coef_norm', 'top_ranked']].copy()
 channel_counts = channel_counts.sort_values('coef_norm', ascending=False)

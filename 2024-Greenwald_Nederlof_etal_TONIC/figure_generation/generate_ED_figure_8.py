@@ -43,6 +43,11 @@ clustergrid.ax_heatmap.set_yticklabels(new_tick_labels)
 clustergrid.savefig(os.path.join(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8a.pdf')), dpi=300)
 plt.close()
 
+# save csv with feature order
+feature_order = [corr_df.columns[i] for i in matrix_order]
+correlation_feature_order = pd.DataFrame({'Clustermap index': range(1, len(matrix_order)+1), 'Feature name including compartment': feature_order})
+correlation_feature_order.to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8a_feature_order.csv'), index=False)
+
 # Feature parameter tuning (panels b, c, d)
 #extraction_pipeline_tuning_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_7_robustness")
 extraction_pipeline_tuning_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_8_robustness")

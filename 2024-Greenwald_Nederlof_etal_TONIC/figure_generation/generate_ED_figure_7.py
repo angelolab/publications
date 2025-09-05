@@ -31,7 +31,7 @@ sns.despine()
 plt.xlabel('Feature Type')
 plt.ylabel('Number of Features')
 ax.set_ylim([0, 45])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13a.pdf'), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7a.pdf'), dpi=300)
 plt.close()
 
 
@@ -58,7 +58,7 @@ ax.get_legend().remove()
 ax.figure.colorbar(sm, ax=ax)
 plt.tight_layout()
 
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13b.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7b.pdf'))
 plt.close()
 
 # by comparison
@@ -73,7 +73,7 @@ sns.barplot(data=top_features_by_comparison, x='comparison', y='num_features', c
 plt.xticks(rotation=90)
 plt.tight_layout()
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13e.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7e.pdf'))
 plt.close()
 
 # by data type
@@ -89,7 +89,7 @@ sns.barplot(data=top_features_by_data_type, x='data_type', y='num_features', col
 plt.xticks(rotation=90)
 plt.tight_layout()
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13d.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7d.pdf'))
 plt.close()
 
 
@@ -106,7 +106,7 @@ ax.set_ylim(0, 90)
 sns.barplot(data=feature_counts, x='num_comparisons', y='num_features', color='grey', ax=ax)
 plt.tight_layout()
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13f.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7f.pdf'))
 plt.close()
 
 
@@ -115,7 +115,7 @@ combined_df = pd.read_csv(os.path.join(ANALYSIS_DIR, 'timepoint_combined_feature
 plt_titles = {'primary': 'Primary', 'baseline': 'Baseline', 'pre_nivo': 'Pre nivo', 'on_nivo': 'On nivo'}
 
 # Cancer / Immune mixing scores
-os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13j'), exist_ok=True)
+os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7j'), exist_ok=True)
 for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     plot_df = combined_df.loc[(combined_df.feature_name_unique == 'Cancer_Immune_mixing_score') &
                               (combined_df.Timepoint == timepoint), :]
@@ -129,11 +129,11 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     ax.set_ylim([0, 1])
     sns.despine()
     plt.tight_layout()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13j', '{}.pdf'.format(timepoint)))
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7j', '{}.pdf'.format(timepoint)))
     plt.close()
 
 # Ki67+ in Cancer cells
-os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13k'), exist_ok=True)
+os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7k'), exist_ok=True)
 for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     plot_df = combined_df.loc[(combined_df.feature_name_unique == 'Ki67+__Cancer_1') &
                               (combined_df.Timepoint == timepoint), :]
@@ -147,11 +147,11 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     ax.set_ylim([0, 1])
     sns.despine()
     plt.tight_layout()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13k', '{}.pdf'.format(timepoint)))
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7k', '{}.pdf'.format(timepoint)))
     plt.close()
 
 # GLUT1+ in Cancer cells
-os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13l'), exist_ok=True)
+os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7l'), exist_ok=True)
 for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     plot_df = combined_df.loc[(combined_df.feature_name_unique == 'GLUT1+__Cancer_1') &
                               (combined_df.Timepoint == timepoint), :]
@@ -165,5 +165,5 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     ax.set_ylim([0, 1])
     sns.despine()
     plt.tight_layout()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_13l', '{}.pdf'.format(timepoint)))
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_7l', '{}.pdf'.format(timepoint)))
     plt.close()

@@ -24,9 +24,9 @@ hne_fovs = [
     "TONIC_TMA2_R7C4",
     "TONIC_TMA4_R12C4"]
 
-hne_path = Path(SUPPLEMENTARY_FIG_DIR) / "supp_figure_1b_masks"
+hne_path = Path(SUPPLEMENTARY_FIG_DIR) / "ED_figure_1b_masks"
 
-save_dir = Path(SUPPLEMENTARY_FIG_DIR) / "supp_figure_1b"
+save_dir = Path(SUPPLEMENTARY_FIG_DIR) / "ED_figure_1b"
 save_dir.mkdir(exist_ok=True, parents=True)
 for fov in hne_fovs:
     supplementary_plot_helpers.CorePlot(
@@ -51,7 +51,7 @@ plt.title("Number of FOVs per Timepoint")
 plt.xlabel("Number of FOVs")
 plt.tight_layout()
 
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_1c.pdf"), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "ED_figure_1c.pdf"), dpi=300)
 plt.close()
 
 # create upset plot of timepoint sample overlap
@@ -72,7 +72,7 @@ contents_dict = {'Primary': timepoint_metadata.loc[timepoint_metadata.Timepoint 
 
 upset_data = from_contents(contents_dict)
 plot(upset_data, sort_categories_by='-input')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_1d.pdf'), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_1d.pdf'), dpi=300)
 
 
 # venn diagram of modalities across timepoints
@@ -113,6 +113,6 @@ for timepoint, plot_name in zip(['baseline', 'pre_nivo', 'on_nivo'], ["e", "f", 
             'RNA': rna_ids}
         venny4py(sets=sets, colors="br")
 
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_1{}.pdf'.format(plot_name)), dpi=300,
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_1{}.pdf'.format(plot_name)), dpi=300,
                 bbox_inches='tight')
     plt.close()

@@ -22,7 +22,7 @@ raw_dir = "/Volumes/Shared/Noah Greenwald/TONIC_Acquisition/"
 SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
 # show a run with images stitched in acquisition order pre- and post-normalization
-norm_tiling = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_4_tiles")
+norm_tiling = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_3_tiles")
 if not os.path.exists(norm_tiling):
     os.makedirs(norm_tiling)
 
@@ -66,7 +66,7 @@ qc_tmas.qc_tma_metrics_zscore(tmas=tmas, channel_exclude=channel_exclude)
 qc_metrics_plots.qc_tmas_metrics_plot(qc_tmas=qc_tmas, tmas=tmas, save_figure=True, dpi=300)
 
 shutil.copy(os.path.join(qc_tma_metrics_dir, "figures/cross_TMA_averages_nonzero_mean_stats.pdf"),
-            os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_4g.pdf"))
+            os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_3g.pdf"))
 
 # longitudinal controls
 control_path = os.path.join(BASE_DIR, "image_data/controls")
@@ -202,4 +202,4 @@ ax_avg.set_xlabel("FOV")
 fig.savefig(fname=os.path.join(qc_control_metrics_dir, "figures/log2_avgs.png"), dpi=300,
             bbox_inches="tight")
 shutil.copy(os.path.join(qc_control_metrics_dir, "figures/log2_avgs.pdf"),
-            os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_4f.pdf"))
+            os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_3f.pdf"))

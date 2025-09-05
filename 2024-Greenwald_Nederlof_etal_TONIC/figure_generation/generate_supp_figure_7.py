@@ -130,7 +130,7 @@ ax2 = mp2.get_axes()['mainplot_ax']
 ax2.set_title('Functional', fontsize = 14)
 ax2.set_yticklabels([])
 ax2.set_yticks([])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17a.pdf'), bbox_inches = 'tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7a.pdf'), bbox_inches = 'tight')
 
 feature_ranking = pd.read_csv(os.path.join('Cancer_reclustering', 'SpaceCat', 'feature_ranking.csv'))
 feature_ranking_df = feature_ranking[np.isin(feature_ranking['comparison'], ['primary', 'baseline', 'pre_nivo', 'on_nivo'])]
@@ -181,7 +181,7 @@ for i in range(0, len(feature_list)):
     g.set_ylabel('Proportion', fontsize=10)
     axes.set_title(f'{f} Ki67+', fontsize=10)
     plt.ylim(-0.05, 1)
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17c_Ki67+.pdf'), bbox_inches='tight')
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7c_Ki67+.pdf'), bbox_inches='tight')
 
 colors_dict = {'No': '#2089D5', 'Yes': 'lightgrey'}
 feature_list = ['Cancer_HLADR__cell_cluster_revised_density', 'Cancer_Vim__cell_cluster_revised_density']
@@ -220,7 +220,7 @@ for i in range(0, len(feature_list)):
     g.set_xlabel('Clinical Benefit', fontsize=10)
     g.set_ylabel('Mean', fontsize=10)
     axes.set_title(f'{f} density', fontsize=10)
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17c_density.pdf'), bbox_inches='tight')
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7c_density.pdf'), bbox_inches='tight')
 
 # NEOTRIP DATA
 adata = anndata.read_h5ad('/Volumes/Shared/Noah Greenwald/NTPublic/adata/adata_preprocessed.h5ad')
@@ -366,7 +366,7 @@ ax2 = mp2.get_axes()['mainplot_ax']
 ax2.set_title('Functional', fontsize = 14)
 ax2.set_yticklabels([])
 ax2.set_yticks([])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17b.pdf'), bbox_inches = 'tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7b.pdf'), bbox_inches = 'tight')
 
 cell_densities = pd.read_csv('cell_densities.csv')
 ki67 = pd.read_csv('Ki67_positivity.csv')
@@ -406,7 +406,7 @@ for i in range(0, len(feature_list)):
     axes.set_xlabel("Timepoint", fontsize = 10)  # optional: remove x-axis label
     axes.set_ylabel("Proportion", fontsize = 10)  # optional: label your y-axis
     plt.ylim(-0.05, 1)
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17d_Ki67+.pdf'), bbox_inches = 'tight')
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7d_Ki67+.pdf'), bbox_inches = 'tight')
 
 feature_list = ['MHC I&II^{hi}', 'Vimentin^{+}EMT']
 feature_list_nice = ['MHC I&IIhi', 'Vimentin+EMT']
@@ -435,4 +435,4 @@ for i in range(0, len(feature_list)):
     axes.set_title(f'{f} Density', fontsize=10)
     axes.set_xlabel("Timepoint", fontsize = 10)  # optional: remove x-axis label
     axes.set_ylabel("raw_mean", fontsize = 10)  # optional: label your y-axis
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_17d_density.pdf'), bbox_inches = 'tight')
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_7d_density.pdf'), bbox_inches = 'tight')

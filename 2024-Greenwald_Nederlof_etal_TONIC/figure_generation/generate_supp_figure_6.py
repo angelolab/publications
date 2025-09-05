@@ -17,7 +17,7 @@ SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
 
 # Analyse the significance scores of top features after randomization compared to the TONIC data.
-fp_dir = os.path.join(BASE_DIR, "supplementary_figs", 'supp_figure_12a_files')
+fp_dir = os.path.join(BASE_DIR, "supplementary_figs", 'supp_figure_6a_files')
 
 '''
 # compute random feature sets
@@ -63,7 +63,7 @@ avg_scores['abs_med_diff'] = abs(avg_scores['med_diff'])
 top_features['abs_med_diff'] = abs(top_features['med_diff'])
 
 # log p-value & effect size plots
-for name, metric in zip(['supp_figure_12a', 'supp_figure_12c'], ['log_pval', 'abs_med_diff']):
+for name, metric in zip(['supp_figure_6a', 'supp_figure_6c'], ['log_pval', 'abs_med_diff']):
     # plot metric dist in top features for TONIC data and one random set
     TONIC = top_features[top_features.seed == 0]
     random = top_features[top_features.seed == 228]
@@ -80,7 +80,7 @@ for name, metric in zip(['supp_figure_12a', 'supp_figure_12c'], ['log_pval', 'ab
     plt.show()
     plt.close()
 
-for name, metric in zip(['supp_figure_12b', 'supp_figure_12d'], ['log_pval', 'abs_med_diff']):
+for name, metric in zip(['supp_figure_6b', 'supp_figure_6d'], ['log_pval', 'abs_med_diff']):
     # plot average metric across top features for each set
     g = sns.distplot(avg_scores[metric][1:], kde=True,  color='#ff7f0e')
     g.axvline(x=avg_scores[metric][0], color='#1f77b4')
@@ -110,7 +110,7 @@ plt.hist(repeated_features_num.repeated_features)
 plt.xlabel('Number of TONIC Top Features in each Random Set')
 plt.title('Histogram of Overlapping Features')
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, f"supp_figure_12e.pdf"), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, f"supp_figure_6e.pdf"), dpi=300)
 plt.show()
 plt.close()
 
@@ -150,7 +150,7 @@ g.set_ylabel('number of comparisons', fontsize = 12)
 g.set_xlabel('abs(correlation)', fontsize = 12)
 plt.legend(prop={'size':9})
 g.set_xlim(0, 1)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12f.pdf'), bbox_inches = 'tight', dpi = 300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6f.pdf'), bbox_inches = 'tight', dpi = 300)
 plt.close()
 
 # get overlap between static and evolution top features
@@ -188,5 +188,5 @@ for overlap_type, comparisons in overlap_type_dict.items():
 static_ids = overlap_results['global']['static_ids']
 evolution_ids = overlap_results['global']['evolution_ids']
 venn2([set(static_ids), set(evolution_ids)], set_labels=('Static', 'Evolution'))
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_12g.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6g.pdf'))
 plt.close()

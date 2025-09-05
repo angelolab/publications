@@ -11,7 +11,7 @@ raw_dir = "/Volumes/Shared/Noah Greenwald/TONIC_Acquisition/"
 SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
 # show a run with images pre- and post-Rosetta
-rosetta_tiling = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_3b_tiles")
+rosetta_tiling = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_2b_tiles")
 if not os.path.exists(rosetta_tiling):
     os.makedirs(rosetta_tiling)
 

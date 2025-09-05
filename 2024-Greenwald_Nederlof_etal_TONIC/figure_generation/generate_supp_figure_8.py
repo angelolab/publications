@@ -111,8 +111,8 @@ for immune_drop, coords in [[0, (0, 0)], [0.10, (0, 1)], [0.25, (1, 0)], [0.50, 
     if immune_drop == 0.0:
         axs2[i][j].set_title(f'All features')
 
-fig.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18a.pdf'), bbox_inches='tight', dpi=300)
-fig2.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18b.pdf'), bbox_inches='tight', dpi=300)
+fig.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8a.pdf'), bbox_inches='tight', dpi=300)
+fig2.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8b.pdf'), bbox_inches='tight', dpi=300)
 
 ## 4.5 Other/Stroma_Collagen/Stroma_Fibronectin/SMA/VIM to Cancer reassignment ##
 cancer_recluster = pd.read_csv(os.path.join(BASE_DIR, 'supplementary_figs/review_figures/Cancer_reclustering', 'reassigned_cell_table.csv'))
@@ -127,7 +127,7 @@ for c, ax in zip(['Other', 'Stroma_Collagen', 'Stroma_Fibronectin', 'SMA', 'VIM'
     ax.set_xlim((0, 1))
     ax.set_ylim((0, 10))
     ax.set_title(f'{c} neighborhoods')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18c.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8c.pdf'), bbox_inches='tight')
 
 
 fig, ax = plt.subplots(1, 1, figsize=(8, 6))
@@ -142,7 +142,7 @@ plt.title('Cancer cell cluster proportions')
 green_patch = mpatches.Patch(color='green', label='New Cancer cells')
 grey_patch = mpatches.Patch(color='lightgrey', label='Original Cancer cells')
 plt.legend(handles=[green_patch, grey_patch])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18e.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8e.pdf'), bbox_inches='tight')
 
 counts_table = cancer_recluster[cancer_recluster.cell_meta_cluster.isin(['Other', 'Stroma_Collagen', 'Stroma_Fibronectin', 'SMA', 'VIM'])][['cell_meta_cluster', 'cell_meta_cluster_new']]
 counts_table = counts_table.groupby(by=['cell_meta_cluster', 'cell_meta_cluster_new'], observed=True).value_counts().reset_index()
@@ -157,7 +157,7 @@ green_patch = mpatches.Patch(color='green', label='New Cancer cells')
 grey_patch = mpatches.Patch(color='lightgrey', label='Non-cancer')
 plt.legend(handles=[green_patch, grey_patch])
 plt.ylabel('Cell Type')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18d.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8d.pdf'), bbox_inches='tight')
 
 ## 4.6.1 immune_agg features ##
 immune_agg_viz_dir = os.path.join(BASE_DIR, 'supplementary_figs/review_figures', "immune_agg_features")
@@ -267,7 +267,7 @@ for subset in ['immune_agg']:
     ax.figure.colorbar(sm, ax=ax)
     plt.title(plot_title)
     plt.tight_layout()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18h.pdf'))
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8h.pdf'))
 
 # generate prediction comparison boxplot
 preds = pd.read_csv(os.path.join(immune_agg_viz_dir, 'all_timepoints_results_MIBI-immune_agg.csv'))
@@ -300,7 +300,7 @@ green_line = mlines.Line2D([], [], color="darkseagreen", marker="o", label="excl
 plt.legend(handles=[blue_line, green_line], loc='lower right')
 sns.despine()
 
-plt.savefig(os.path.join(immune_agg_viz_dir, 'supp_figure_18i.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(immune_agg_viz_dir, 'supp_figure_8i.pdf'), bbox_inches='tight', dpi=300)
 
 # immune_agg properties
 agg_count_df = pd.read_csv(os.path.join(immune_agg_viz_dir, 'immune_agg_counts_per_fov.csv'))
@@ -309,7 +309,7 @@ plt.title('Number of immune aggregates per image')
 plt.xlabel('Immune Aggregate Objects')
 plt.xlim((0, 23))
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18f.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8f.pdf'))
 
 mask_areas = pd.read_csv(os.path.join(INTERMEDIATE_DIR, 'mask_dir/fov_annotation_mask_area.csv'))
 new_df = mask_areas[mask_areas.compartment == 'immune_agg'][['fov', 'area']]
@@ -322,7 +322,7 @@ sns.histplot(new_df.immune_agg_proportion)
 plt.title('Proportion of immune aggregates per image')
 plt.xlabel('Tissue Proportion')
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18g.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8g.pdf'))
 
 ## 3.2 Low cellularity ##
 low_cellularity_viz_dir = os.path.join(BASE_DIR, 'supplementary_figs/review figures', "low_cellularity")
@@ -344,7 +344,7 @@ plt.legend(handles=[top_bar, bottom_bar])
 plt.xticks([])
 plt.title("Low Cellularity by Patient")
 plt.ylabel("# of Images")
-plt.savefig(os.path.join(low_cellularity_viz_dir, 'supp_figure_18k.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(low_cellularity_viz_dir, 'supp_figure_8k.pdf'), bbox_inches='tight', dpi=300)
 
 # low cellularity by timepoint
 cellularity_df = pd.read_csv(os.path.join(low_cellularity_viz_dir, 'low_cellularity_images.csv'))
@@ -363,7 +363,7 @@ plt.legend(handles=[top_bar, bottom_bar])
 plt.xticks(rotation=45)
 plt.title("Low Cellularity by Timepoint")
 plt.ylabel("# of Images")
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18l.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8l.pdf'), bbox_inches='tight', dpi=300)
 
 # low cellularity vs regular image features
 ranked_features_df = pd.readcsv(os.path.join(low_cellularity_viz_dir, 'cellularity_feature_ranking.csv'))
@@ -376,7 +376,7 @@ sns.barplot(top_fts_type, y='feature_type', x='feature_name_unique')
 plt.ylabel("Feature Type")
 plt.xlabel("Count")
 plt.title("Top Features Differing Between Low Cellularity and Regular Images")
-plt.savefig(os.path.join(low_cellularity_viz_dir, 'supp_figure_18m.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(low_cellularity_viz_dir, 'supp_figure_8m.pdf'), bbox_inches='tight', dpi=300)
 
 # DROPPING LOW CELL IMAGES
 adata = anndata.read_h5ad(os.path.join(ANALYSIS_DIR, 'adata_processed.h5ad'))
@@ -402,4 +402,4 @@ line_15 = mlines.Line2D([], [], color="purple", marker='_', label="15% of images
 line_20 = mlines.Line2D([], [], color="black", marker='_', label="20% of images", linestyle='None')
 plt.legend(handles=[line_5, line_10, line_15, line_20], loc='upper right')
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_18j.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8j.pdf'), bbox_inches='tight', dpi=300)

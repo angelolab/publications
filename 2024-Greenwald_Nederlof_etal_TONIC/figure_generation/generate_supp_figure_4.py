@@ -19,7 +19,7 @@ image_dir = os.path.join(BASE_DIR, "image_data/samples")
 SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
 # Segmentation channels and overlays
-save_dir = Path(SUPPLEMENTARY_FIG_DIR) / "supp_figure_5_tiles"
+save_dir = Path(SUPPLEMENTARY_FIG_DIR) / "supp_figure_4_tiles"
 save_dir.mkdir(exist_ok=True, parents=True)
 
 membrane_channels = ["CD14", "CD38", "CD45", "ECAD", "CK17"]
@@ -75,5 +75,5 @@ sns.despine()
 plt.title("Histogram of Cell Counts per Image")
 plt.xlabel("Number of Cells in an Image")
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_5d.pdf"), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_4d.pdf"), dpi=300)
 plt.close()

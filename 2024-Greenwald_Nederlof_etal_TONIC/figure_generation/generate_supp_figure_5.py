@@ -40,17 +40,17 @@ clustergrid.ax_heatmap.set_yticks(new_tick_positions)
 clustergrid.ax_heatmap.set_xticklabels(new_tick_labels)
 clustergrid.ax_heatmap.set_yticklabels(new_tick_labels)
 
-clustergrid.savefig(os.path.join(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8a.pdf')), dpi=300)
+clustergrid.savefig(os.path.join(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_5a.pdf')), dpi=300)
 plt.close()
 
 # save csv with feature order
 feature_order = [corr_df.columns[i] for i in matrix_order]
 correlation_feature_order = pd.DataFrame({'Clustermap index': range(1, len(matrix_order)+1), 'Feature name including compartment': feature_order})
-correlation_feature_order.to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8a_feature_order.csv'), index=False)
+correlation_feature_order.to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_5a_feature_order.csv'), index=False)
 
 # Feature parameter tuning (panels b, c, d)
 #extraction_pipeline_tuning_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_7_robustness")
-extraction_pipeline_tuning_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_8_robustness")
+extraction_pipeline_tuning_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_5_robustness")
 if not os.path.exists(extraction_pipeline_tuning_dir):
     os.makedirs(extraction_pipeline_tuning_dir)
 
@@ -229,7 +229,7 @@ for metric in feature_fovs:
         fiber_table_sub[f'{metric}_norm'] = fiber_table_sub[f'{metric}_norm'] + 0.5
     metric = f'{metric}_norm'
 
-    save_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_8ij', f'colored_{metric}')
+    save_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_5ij', f'colored_{metric}')
     os.makedirs(save_dir, exist_ok=True)
     color_segmentation_by_stat(
         fovs=fiber_table_sub.fov.unique(), data_table=fiber_table_sub, seg_dir=fibseg_dir, save_dir=save_dir,

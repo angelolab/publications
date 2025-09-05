@@ -14,7 +14,7 @@ SUPPLEMENTARY_FIG_DIR = os.path.join(BASE_DIR, "supplementary_figs")
 
 
 # Generate overlays of entire panel across representative images
-panel_validation_viz_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_2_overlays_text")
+panel_validation_viz_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_1_overlays_text")
 if not os.path.exists(panel_validation_viz_dir):
     os.makedirs(panel_validation_viz_dir)
 exclude_chans = ["Au", "CD11c_nuc_exclude", "CK17_smoothed", "ECAD_smoothed", "FOXP3_nuc_include",

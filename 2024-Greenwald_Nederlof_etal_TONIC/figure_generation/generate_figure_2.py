@@ -356,7 +356,7 @@ feature_metadata.loc[feature_metadata.feature_type.isin(
     ['density_ratio', 'linear_distance', 'kmeans_cluster', 'mixing_score', 'compartment_area', 'compartment_area_ratio']),
                      'cell_class'] = 'Multiple'
 
-feature_metadata.loc[feature_metadata.feature_type.isn(['fiber', 'pixie_ecm', 'ecm_fraction', 'ecm_cluster']), 'cell_class'] = 'ECM'
+feature_metadata.loc[feature_metadata.feature_type.isin(['fiber', 'pixie_ecm', 'ecm_fraction', 'ecm_cluster']), 'cell_class'] = 'ECM'
 
 feature_metadata.loc[feature_metadata.feature_name.str.contains('Immune_Other'), 'cell_class'] = 'Multiple'
 feature_metadata.loc[feature_metadata.feature_name.str.contains('Other'), 'cell_class'] = 'Multiple'

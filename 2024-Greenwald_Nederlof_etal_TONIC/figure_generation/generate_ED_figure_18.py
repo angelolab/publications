@@ -379,7 +379,7 @@ plt.title("Top Features Differing Between Low Cellularity and Regular Images")
 plt.savefig(os.path.join(low_cellularity_viz_dir, 'supp_figure_18m.pdf'), bbox_inches='tight', dpi=300)
 
 # DROPPING LOW CELL IMAGES
-adata = anndata.read_h5ad(os.path.join(ANALYSIS_DIR, 'adata_preprocessed.h5ad'))
+adata = anndata.read_h5ad(os.path.join(ANALYSIS_DIR, 'adata_processed.h5ad'))
 cell_table = adata.obs
 
 cluster_counts = np.unique(cell_table.fov, return_counts=True)[1]

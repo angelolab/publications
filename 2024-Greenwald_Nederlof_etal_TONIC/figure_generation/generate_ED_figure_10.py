@@ -285,8 +285,8 @@ for timepoint in ['Baseline', 'On-treatment']:
         ax.set_ylim(lims)
         sns.despine()
         plt.tight_layout()
-        os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16'), exist_ok=True)
-        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16', '{}_{}.pdf'.format(feature, timepoint)))
+        os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10'), exist_ok=True)
+        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10', '{}_{}.pdf'.format(feature, timepoint)))
         plt.close()
 
 
@@ -346,7 +346,7 @@ blue_line = mlines.Line2D([], [], color="#1f77b4", marker="o", label="SpaceCat p
 green_line = mlines.Line2D([], [], color="darkseagreen", marker="o", label="SpaceCat & Wang et al. features", linestyle='None')
 plt.legend(handles=[yellow_line, blue_line, green_line], loc='lower right')
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16f.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10f.pdf'), bbox_inches='tight', dpi=300)
 
 # TONIC DATA COMPARISON
 SpaceCat_dir = os.path.join(BASE_DIR, 'TONIC_SpaceCat')
@@ -392,7 +392,7 @@ blue_line = mlines.Line2D([], [], color="#1f77b4", marker="o", label="SpaceCat f
 yellow_line = mlines.Line2D([], [], color="gold", marker="o", label="Wang et al. features", linestyle='None')
 green_line = mlines.Line2D([], [], color="darkseagreen", marker="o", label="SpaceCat & Wang et al. features", linestyle='None')
 plt.legend(handles=[blue_line, yellow_line, green_line], loc='lower right')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16g.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10g.pdf'), bbox_inches='tight', dpi=300)
 
 
 # NT feature enrichment on TONIC data
@@ -412,7 +412,7 @@ sns.barplot(data=top_features_by_comparison, x='comparison', y='num_features', c
 plt.xticks(rotation=90)
 plt.tight_layout()
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16j.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10j.pdf'))
 plt.close()
 
 ## 2.8 / 4.8  Pre-treatment and On-treatment NT vs TONIC comparisons ##
@@ -471,14 +471,14 @@ TONIC_feats = set(tonic_pre_treatment_features.feature_name_unique.unique())
 sets = {'Wang et al.': NT_feats, 'TONIC': TONIC_feats}
 venny4py(sets=sets, colors="yb")
 plt.title("Pre-treatment Features")
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16a.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10a.pdf'), bbox_inches='tight', dpi=300)
 
 NT_feats = set(on_treatment_features.feature_name_unique.unique())
 TONIC_feats = set(tonic_on_treatment_features.feature_name_unique.unique())
 sets = {'Wang et al.': NT_feats, 'TONIC': TONIC_feats}
 venny4py(sets=sets, colors="yb")
 plt.title("On-treatment Features")
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16h.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10h.pdf'), bbox_inches='tight', dpi=300)
 
 # compare SpaceCat features
 NT_features = pd.read_csv(os.path.join(NT_DIR, 'SpaceCat/analysis_files/feature_ranking_immunotherapy+chemotherapy.csv'))
@@ -500,14 +500,14 @@ TONIC_feats = set(tonic_pre_treatment_features.feature_name_unique.unique())
 sets = {'Wang et al.': NT_feats, 'TONIC': TONIC_feats}
 venny4py(sets=sets, colors="yb")
 plt.title("Pre-treatment Features")
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16b.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10b.pdf'), bbox_inches='tight', dpi=300)
 
 NT_feats = set(NT_on_treatment_features.feature_name_unique.unique())
 TONIC_feats = set(tonic_on_treatment_features.feature_name_unique.unique())
 sets = {'Wang et al.': NT_feats, 'TONIC': TONIC_feats}
 venny4py(sets=sets, colors="yb")
 plt.title("On-treatment Features")
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16i.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10i.pdf'), bbox_inches='tight', dpi=300)
 
 
 colors_dict = {'original':'#C9C9C9', 'updated': '#78CE8B'}
@@ -534,7 +534,7 @@ g.set_xlabel('Timepoint', fontsize=10)
 g.set_ylabel('AUC', fontsize=10)
 g.set_ylim(0.4, 1.0)
 plt.savefig(os.path.join('auc.pdf'), bbox_inches='tight')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16l.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10l.pdf'), bbox_inches='tight', dpi=300)
 
 feature_ranking = pd.read_csv(os.path.join(REVIEW_FIG_DIR, 'Cancer_reclustering', 'SpaceCat', 'feature_ranking.csv'))
 feature_ranking_df = feature_ranking[np.isin(feature_ranking['comparison'], ['primary', 'baseline', 'pre_nivo', 'on_nivo'])]
@@ -566,4 +566,4 @@ for label in v.set_labels:
     if label is not None:
         label.set_fontsize(16)
 
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_16k.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_10k.pdf'), bbox_inches='tight')

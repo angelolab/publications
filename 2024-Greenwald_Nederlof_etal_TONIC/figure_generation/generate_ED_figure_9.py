@@ -24,14 +24,14 @@ sns.stripplot(data=all_model_plot.loc[all_model_plot.top_ranked, :], x='timepoin
               order=['baseline', 'pre_nivo', 'on_nivo'])
 plt.title('Top ranked features')
 plt.ylim([0, 1.05])
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15c.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9c.pdf'))
 plt.close()
 
 # plot number of times features are selected
 sns.histplot(data=all_model_rankings.loc[all_model_rankings.top_ranked, :], x='count', color='grey', multiple='stack',
              binrange=(1, 10), discrete=True)
 plt.title('Number of times features are selected')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15b.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9b.pdf'))
 plt.close()
 
 # plot venn diagram
@@ -42,7 +42,7 @@ rna_induction = rna_rankings_top.loc[rna_rankings_top.timepoint == 'pre_nivo', '
 
 venn3([set(rna_baseline), set(rna_nivo), set(rna_induction)], ('Baseline', 'Nivo', 'Induction'))
 plt.title('RNA top ranked features')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15e.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9e.pdf'))
 plt.close()
 
 # top ranked features from each timepoint
@@ -53,7 +53,7 @@ mibi_induction = mibi_rankings_top.loc[mibi_rankings_top.timepoint == 'pre_nivo'
 
 venn3([set(mibi_baseline), set(mibi_nivo), set(mibi_induction)], ('Baseline', 'Nivo', 'Induction'))
 plt.title('MIBI top ranked features')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15d.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9d.pdf'))
 plt.close()
 
 # compare correlations between top ranked features
@@ -99,7 +99,7 @@ sns.boxplot(data=corr_values, x='model', y='correlation',
 ax.set_title('Feature correlation')
 sns.despine()
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15c.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9c.pdf'))
 plt.close()
 
 # look at interesting features
@@ -167,7 +167,7 @@ plt.ylabel('Mean AUC')
 plt.title('Model accuracy by feature amount')
 sns.despine()
 plt.gca().legend(loc='lower right').set_title('')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15h.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_9h.pdf'), bbox_inches='tight', dpi=300)
 
 # multimodal prediction plots
 multi_dir = os.path.join(BASE_DIR, 'sequencing_data/multimodal_prediction')
@@ -197,4 +197,4 @@ plt.ylabel('AUC')
 plt.xlabel('')
 plt.ylim((0, 1))
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_15i.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_9i.pdf'), bbox_inches='tight', dpi=300)

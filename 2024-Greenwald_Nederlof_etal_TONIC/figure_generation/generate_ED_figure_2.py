@@ -111,7 +111,7 @@ for cluster_level, figure_name in zip(['cell_cluster_broad', 'cell_cluster'], ['
     plt.title('Cell counts over time', fontsize=12)
     plt.tight_layout()
     sns.despine()
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "supp_figure_6{}.pdf".format(figure_name)), dpi=300)
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, "ED_figure_2{}.pdf".format(figure_name)), dpi=300)
 
 # Proportions of Cancer cells
 cell_table = pd.read_csv('/Volumes/Shared/Noah Greenwald/TONIC_Cohort/analysis_files/cell_table_clusters.csv')
@@ -141,7 +141,7 @@ plt.xlabel('Cell Type')
 plt.ylabel('% of total cancer cells')
 plt.ylim((0,1))
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6g.pdf'), dpi=300, bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_2g.pdf'), dpi=300, bbox_inches='tight')
 
 # Proportions of Structural cells
 all_data = cell_counts[cell_counts.cell_cluster.isin(['Endothelium', 'CAF', 'Fibroblast', 'Smooth_Muscle'])]
@@ -167,7 +167,7 @@ plt.xlabel('Cell Type')
 plt.ylabel('% of total structural cells')
 plt.ylim((0,1))
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6h.pdf'), dpi=300, bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_2h.pdf'), dpi=300, bbox_inches='tight')
 
 # Proportions of Immune cells
 all_data = cell_counts[cell_counts.cell_cluster.isin(['Treg', 'T_Other', 'NK', 'Neutrophil', 'Monocyte', 'Mast', 'Immune_Other', 'Mac_Other', 'CD163_Mac', 'CD68_Mac', 'CD8T', 'CD4T', 'B', 'APC'])]
@@ -195,7 +195,7 @@ plt.xlabel('Cell Type')
 plt.ylabel('% of total structural cells')
 plt.ylim((0, 1))
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6i.pdf'), dpi=300, bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_2i.pdf'), dpi=300, bbox_inches='tight')
 
 # PD1 expression
 cell_table = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/combined_cell_table_normalized_cell_labels_updated.csv'))
@@ -217,7 +217,7 @@ plt.ylabel('PD1 Expression', fontsize=12)
 plt.tick_params(labelsize=10)
 plt.ylim(0, 0.002)
 plt.title('TONIC', fontsize=12)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6j_tonic.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_2j_tonic.pdf'), bbox_inches='tight')
 
 # PD1 expression on CD4T as compared to CD8T in Wang et al.
 adata = anndata.read_h5ad('/Volumes/Shared/Noah Greenwald/NTPublic/adata/adata_preprocessed.h5ad')
@@ -242,7 +242,7 @@ plt.xlabel('cell type', fontsize=12)
 plt.ylabel('PD1 Expression', fontsize=12)
 plt.tick_params(labelsize=10)
 plt.title('NeoTRIP', fontsize=12)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_6j_nt.pdf'), bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_2j_nt.pdf'), bbox_inches='tight')
 
 
 '''

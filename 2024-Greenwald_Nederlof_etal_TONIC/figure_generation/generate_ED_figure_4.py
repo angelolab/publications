@@ -79,13 +79,13 @@ df = df[['all', 'cancer_core', 'cancer_border', 'stroma_border', 'stroma_core']]
 # plt.setp(heatmap.ax_heatmap.yaxis.set_ticklabels(feature_names))
 # plt.tight_layout()
 #
-# plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9a.pdf'), dpi=300, bbox_inches="tight")
+# plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4a.pdf'), dpi=300, bbox_inches="tight")
 #
 # high/low standard deviation feature plot
 df_copy = df.copy()
 df_copy['row_std'] = df_copy.std(axis=1)
 df_copy = df_copy.sort_values(by='row_std')
-df_copy.to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9a_values.csv'))
+df_copy.to_csv(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4a_values.csv'))
 
 low_std = df_copy[:90]
 high_std = df_copy[-90:]
@@ -130,7 +130,7 @@ for df, name in zip([selected_std_data_1, selected_std_data_2], ['high', 'low'])
     #ax.set_xlabel("Compartment")
     plt.tight_layout()
 
-    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9a_{}.pdf'.format(name)), dpi=300, bbox_inches="tight")
+    plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4a_{}.pdf'.format(name)), dpi=300, bbox_inches="tight")
     plt.close()
 
 # histogram of standard deviations
@@ -138,7 +138,7 @@ plt.style.use("default")
 g = sns.histplot(df_copy.row_std)
 g.set(xlabel='Standard Deviation', ylabel='Feature Counts')
 sns.despine()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9c.pdf'), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4c.pdf'), dpi=300, bbox_inches="tight")
 plt.close()
 
 # plot relative scores across specific features
@@ -156,7 +156,7 @@ ax.set_title('Relative scores for {}'.format(feature_name_plot))
 sns.despine()
 ax.set_ylim([0, 20])
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9d.pdf'), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4d.pdf'), dpi=300, bbox_inches="tight")
 plt.close()
 
 # plot relative scores across specific features
@@ -174,7 +174,7 @@ ax.set_title('Relative scores for {}'.format(feature_name_plot))
 sns.despine()
 ax.set_ylim([0, 6])
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9e.pdf'), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4e.pdf'), dpi=300, bbox_inches="tight")
 plt.close()
 
 feature_name_plot = 'Ki67+__Cancer_1'
@@ -191,7 +191,7 @@ ax.set_title('Relative scores for {}'.format(feature_name_plot))
 sns.despine()
 ax.set_ylim([0, 2])
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9f.pdf'), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4f.pdf'), dpi=300, bbox_inches="tight")
 plt.close()
 
 # CD57+__Cancer_1 (0.86), T__distance_to__Cancer (0.76), CD38+__Endothelium (0.62), TBET+__CD4T (0.5), all__total_density (0.4), TBET+__Treg (0.33),
@@ -211,7 +211,7 @@ ax.set_title('Relative scores for {}'.format(feature_name_plot))
 sns.despine()
 ax.set_ylim([0, 2])
 plt.tight_layout()
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9g.pdf'), dpi=300, bbox_inches="tight")
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4g.pdf'), dpi=300, bbox_inches="tight")
 plt.close()
 
 
@@ -293,7 +293,7 @@ g.map_dataframe(sns.stripplot, x="ecm_cluster", y="value", data=temp_df, color='
 plt.suptitle('Functional expression in Structural Cells')
 plt.subplots_adjust(top=0.85)
 plt.ylim(-0.05, 1)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9i.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4i.pdf'), bbox_inches='tight', dpi=300)
 
 # look at M2 macrophages
 temp_df = plot_df[plot_df.subset == 'all']
@@ -307,7 +307,7 @@ g.map_dataframe(sns.stripplot, x="ecm_cluster", y="value", data=temp_df, color='
 plt.suptitle('Functional expression in CD68 Macrophages')
 plt.subplots_adjust(top=0.85)
 plt.ylim(-0.05, 1)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9j.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4j.pdf'), bbox_inches='tight', dpi=300)
 
 temp_df = plot_df[plot_df.subset == 'all']
 temp_df = temp_df[temp_df.metric == 'cluster_freq']
@@ -320,7 +320,7 @@ g.map_dataframe(sns.stripplot, x="ecm_cluster", y="value", data=temp_df, color='
 plt.suptitle('Functional expression in CD68 Macrophages')
 plt.subplots_adjust(top=0.85)
 plt.ylim(-0.05, 1)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9k.pdf'), bbox_inches='tight', dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4k.pdf'), bbox_inches='tight', dpi=300)
 
 # ECM cluster expression
 channel_dir = os.path.join(BASE_DIR, 'image_data/samples')
@@ -381,5 +381,5 @@ cluster_means = transformed_df[~no_ecm_mask].groupby('tile_cluster').mean()
 
 # plot the average images
 cluster_means_clustermap = sns.clustermap(cluster_means, cmap='Reds', figsize=(10, 10))
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_9h.pdf'), dpi=300)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_4h.pdf'), dpi=300)
 plt.close()

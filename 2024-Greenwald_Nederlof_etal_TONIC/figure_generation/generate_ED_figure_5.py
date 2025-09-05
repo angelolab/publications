@@ -18,7 +18,7 @@ ANALYSIS_DIR = os.path.join(BASE_DIR, "analysis_files")
 
 ## 3.5 Baseline to On-nivo feature evolution ##
 
-baseline_on_nivo_viz_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_10')
+baseline_on_nivo_viz_dir = os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_5')
 harmonized_metadata = pd.read_csv(os.path.join(ANALYSIS_DIR, 'harmonized_metadata.csv'))
 timepoint_features = pd.read_csv(os.path.join(ANALYSIS_DIR, 'timepoint_features_filtered.csv'))
 timepoint_features = timepoint_features.merge(harmonized_metadata[['Patient_ID', 'Tissue_ID', 'Timepoint', 'baseline__on_nivo']].drop_duplicates(), on='Tissue_ID')

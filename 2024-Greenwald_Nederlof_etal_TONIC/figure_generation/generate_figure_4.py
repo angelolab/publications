@@ -254,11 +254,11 @@ for i in range(0, pivot_df_top_run.shape[0]):
         # Redraw the figure
         plt.draw()
 
-plt.savefig(os.path.join(base_dir, 'figures', 'Figure4b.pdf'), bbox_inches = 'tight', dpi =300)
+plt.savefig(os.path.join(plot_dir, 'Figure4b.pdf'), bbox_inches = 'tight', dpi =300)
 
 
 # longitudinal T / Cancer ratios
-combined_df = pd.read_csv(os.path.join(base_dir, 'analysis_files/timepoint_combined_features_with_outcomes.csv'))
+combined_df = pd.read_csv(os.path.join(base_dir, 'analysis_files/timepoint_combined_features_outcome_labels.csv'))
 
 
 # generate summary plots
@@ -282,7 +282,7 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
 
 # identify patients to show for visualization
 # # check for longitudinal patients
-# longitudinal_patients = combined_df.loc[combined_df.Timepoint.isin(['primary_untreated', 'baseline', 'post_induction', 'on_nivo',]), :]
+# longitudinal_patients = combined_df.loc[combined_df.Timepoint.isin(['primary', 'baseline', 'pre_nivo', 'on_nivo',]), :]
 # longitudinal_patients = longitudinal_patients.loc[longitudinal_patients.Clinical_benefit == 'Yes', :]
 # longitudinal_patients = longitudinal_patients.loc[longitudinal_patients.feature_name_unique == 'T__Cancer__ratio__cancer_border', :]
 #

@@ -30,15 +30,25 @@ segmentation_dir = os.path.join(base_dir, 'segmentation_data/deepcell_output/')
 harmonized_metadata = pd.read_csv(os.path.join(metadata_dir, 'harmonized_metadata.csv'))
 timepoint_metadata = pd.read_csv(os.path.join(metadata_dir, 'TONIC_data_per_timepoint.csv'))
 timepoint_metadata = timepoint_metadata.loc[timepoint_metadata.MIBI_data_generated, :]
+timepoint_metadata = timepoint_metadata[timepoint_metadata.Timepoint.isin(['baseline', 'primary', 'pre_nivo', 'on_nivo'])]
 
+outcome_data = pd.read_csv(os.path.join(base_dir, 'intermediate_files/metadata/patient_clinical_data.csv'))
+timepoint_metadata = timepoint_metadata.merge(outcome_data, on='Patient_ID')
+timepoint_metadata = timepoint_metadata.loc[timepoint_metadata.Clinical_benefit.isin(['Yes', 'No']), :]
 
 # create venn diagram across modalities
 wes_metadata = pd.read_csv(os.path.join(sequence_dir, 'preprocessing/TONIC_WES_meta_table.tsv'), sep='\t')
 rna_metadata = pd.read_csv(os.path.join(sequence_dir, 'preprocessing/TONIC_tissue_rna_id.tsv'), sep='\t')
 rna_metadata = rna_metadata.merge(harmonized_metadata[['Patient_ID', 'Tissue_ID']].drop_duplicates(), on='Tissue_ID', how='left')
 
+# exclude SD patients
+wes_metadata = wes_metadata.rename(columns={'Individual.ID': 'Patient_ID'})
+wes_metadata = wes_metadata.loc[wes_metadata.Clinical_benefit.isin(['Yes', 'No']), :]
+rna_metadata = rna_metadata.merge(outcome_data, on='Patient_ID')
+rna_metadata = rna_metadata.loc[rna_metadata.Clinical_benefit.isin(['Yes', 'No']), :]
+
 MIBI_ids = set(timepoint_metadata.Patient_ID.values)
-WES_ids = set(wes_metadata['Individual.ID'].values)
+WES_ids = set(wes_metadata.Patient_ID.values)
 RNA_ids = set(rna_metadata.Patient_ID.values)
 
 sets = {
@@ -82,7 +92,7 @@ cell_table_clusters = pd.read_csv(os.path.join(base_dir, 'analysis_files/cell_ta
 
 
 crop_cmap = pd.DataFrame({'cell_cluster_broad': ['Cancer', 'Structural', 'Mono_Mac', 'T', 'Other', 'Granulocyte', 'NK', 'B'],
-                          'color': ['dimgrey', 'darksalmon', 'red', 'navajowhite', 'yellowgreen', 'aqua', 'dodgerblue', 'darkviolet']})
+                          'color': ['dimgrey', 'darksalmon', 'red', 'yellow', 'yellowgreen', 'aqua', 'dodgerblue', 'darkviolet']})
 
 crop_plot_dir = os.path.join(plot_dir, 'Figure1_crop_overlays')
 if not os.path.exists(crop_plot_dir):

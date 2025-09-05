@@ -59,7 +59,7 @@ plt.figure(figsize=(14,5))
 sns.boxplot(data=results, x='Term', y='NES', order=medians.index, showfliers=False)
 sns.stripplot(data=results, x='Term', y='NES', order=medians.index, jitter=True, color='gray', alpha=0.5, size=2)
 plt.xticks(rotation=90, ha='center')
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_11a.pdf'), dpi=300, bbox_inches='tight')
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_6a.pdf'), dpi=300, bbox_inches='tight')
 
 ## Get correlations between MIBI and RNAseq data
 # Load MIBI data
@@ -160,7 +160,7 @@ norm = plt.Normalize(corr_pval_df.rank_val.min(), corr_pval_df.rank_val.max())
 sm = plt.cm.ScalarMappable(cmap="icefire", norm=norm)
 ax.get_legend().remove()
 ax.figure.colorbar(sm, ax=ax)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_11b.pdf'))
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_6b.pdf'))
 plt.tight_layout()
 plt.show()
 
@@ -222,6 +222,6 @@ plt.text(0.05, 0.95, f'Spearman r = {corr:.3f}',
 plt.xlabel('RNA-seq feature: '+rnaseq_feature)
 plt.ylabel('MIBI feature: '+mibi_feature)
 plt.tight_layout()
-os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_11'), exist_ok=True)
-plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_11', 'corr_'+rnaseq_feature+'_'+mibi_feature+'.pdf'))
+os.makedirs(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_6'), exist_ok=True)
+plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_6', 'corr_'+rnaseq_feature+'_'+mibi_feature+'.pdf'))
 plt.show()

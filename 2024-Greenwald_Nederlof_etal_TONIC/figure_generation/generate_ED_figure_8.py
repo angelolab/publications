@@ -16,7 +16,7 @@ combined_df = pd.read_csv(os.path.join(BASE_DIR, 'analysis_files/timepoint_combi
 
 for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     for feature, plot_name, lims in zip(['B__NK__ratio__cancer_core', 'CD68_Mac__cluster_density', 'Vim+__CD4T'],
-                                        ['14a', '14b', '14c'], [[-5, 7], [0, 0.1], [0, 1.2]]):
+                                        ['8a', '8b', '8c'], [[-5, 7], [0, 0.1], [0, 1.2]]):
 
         plot_df = combined_df.loc[(combined_df.feature_name_unique == feature) &
                                   (combined_df.Timepoint == timepoint), :]
@@ -30,13 +30,13 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
         ax.set_ylim(lims)
         sns.despine()
         plt.tight_layout()
-        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_{}_{}.pdf'.format(plot_name, timepoint)))
+        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_{}_{}.pdf'.format(plot_name, timepoint)))
         plt.close()
 
 # top features from baseline
 for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
     for feature, plot_name, lims in zip(['Structural__cluster_broad_density__stroma_border', 'Other__Cancer__ratio__stroma_core', 'NK__Other__ratio__stroma_border'],
-                                        ['14d', '14e', '14f'], [[0, 1], [-11, 4], [-10, 0]]):
+                                        ['8d', '8e', '8f'], [[0, 1], [-11, 4], [-10, 0]]):
 
         plot_df = combined_df.loc[(combined_df.feature_name_unique == feature) &
                                   (combined_df.Timepoint == timepoint), :]
@@ -50,5 +50,5 @@ for timepoint in ['primary', 'baseline', 'pre_nivo', 'on_nivo']:
         ax.set_ylim(lims)
         sns.despine()
         plt.tight_layout()
-        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'supp_figure_{}_{}.pdf'.format(plot_name, timepoint)))
+        plt.savefig(os.path.join(SUPPLEMENTARY_FIG_DIR, 'ED_figure_{}_{}.pdf'.format(plot_name, timepoint)))
         plt.close()

@@ -9,7 +9,7 @@ The TONIC data files can be found [here](https://zenodo.org/records/14112853). T
 - [Directory Structure](#directory-structure)
 - [Data Structures](#data-structures)
 - [Analysis Files](#analysis-files)
-- [Output Files](#output-files)
+- [Feature Tables (adata_processed.uns)](#feature-tables)
 
 
 
@@ -54,17 +54,15 @@ data, such as which patients have data from multiple timepoints.
 
 [3_create_image_masks.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/3_create_image_masks.py): This file creates masks for each image based on supplied criteria. It identifies background based on the gold channel and tumor compartments based on ECAD staining patterns. It then takes these masks, and assigns each cell each image to the mask that it overlaps most with.
 
-[4_ecm_preprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/4_ecm_preprocessing.py): This file creates ECM masks for each image based on the expression level of Collagen, Fibronectin, and FAP. We classified sections of each image as either Cold Collagen, Hot Collagen, or non-ECM, and then calculated the proportion of these classification in the image. 
+[4_ecm_preprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/4_ecm_preprocessing.py): This file creates ECM masks for each image based on the expression level of Collagen, Fibronectin, and FAP. We classified sections of each image as either Cold Collagen, Hot Collagen, or non-ECM, and then calculated the proportion of these classification in the image.
 
-[5_create_dfs_per_core.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/5_create_dfs_per_core.py): This file creates the dfs which will be used for plotting core-level information. It transforms the cell table into
-a series of long-format dfs which can be easily used for data visualization. It creates separate dfs for cell population evaluations, functional marker
-evaluation, etc.
+[5_file_formatting.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/5_file_formatting.py): This file formats the input data files for SpaceCat processing.
 
-[6_create_fov_stats.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/6_create_fov_stats.py): This file aggregates the various fov features and timepoint features into separate files, and  additionally filters out any unnecessary features based on their correlation within compartments.
+[6_run_SpaceCat.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/6_run_SpaceCat.py): This runs SpaceCat, which generates fov level features and filters out any unnecessary features based on their correlation within compartments. It then aggregates features at the patient level and compares them across various timepoints and treatments. For MIBI data, it generates a feature ranking based on p-values and importance scores.
 
-[7_create_evolution_df.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/7_create_evolution_df.py): This file compares features across various timepoints and treatments. 
+[7_genomics_postprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/7_genomics_postprocessing.py): This file processes genomics data and creates the feature table.
 
-[8_genomics_postprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/8_genomics_postprocessing.py): This file processes genomics data and creates the feature table.
+[genomics_nivo_outcomes.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/genomics_nivo_outcomes.py): This file generates a feature ranking based on p-values and importance scores, specifically for the genomics data.
 
 
 ### multivariate_modeling
@@ -101,23 +99,19 @@ about each fov, each timepoint, and each patient, as appropriate for your study.
   * segmentation_data
     * deepcell_output
   * analysis_files
-  * output_files
   * intermediate_files
     * metadata
-    * post_processing - contains specifications for the filtering of the data tables in *output_files*  
+    * post_processing - contains cell table outputted from Pixie
     * mask_dir - contains the compartment masks generated in [3_create_image_masks.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/3_create_image_masks.py)
-    * fiber_segmentation_processed_data - image level fiber analysis ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/example_fiber_segmentation-TONIC.ipynb))
-      * tile_stats_512 - 512x512 tile analysis
-    * spatial_analysis
-      * dist_mats
-      * neighborhood_mats - neighboring cell count/frequency at specified pixel radius and cell cluster level 
-      * mixing_score - image level mixing score of various cell population combinations ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/Calculate_Mixing_Scores-TONIC.ipynb))
-      * cell_neighbor_analysis - data detailing cell diversity and linear distance between cell populations in an image ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/cell_neighbors_analysis-TONIC.ipynb))
-      * neighborhood_analysis - kmeans neighborhood analysis ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/example_neighborhood_analysis_script-TONIC.ipynb))
-    * ecm - generated in [4_ecm_preprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/4_ecm_preprocessing.py)
-    * ecm_pixel_clustering - generated in [ECM_Pixie_Cluster_Pixels.ipynb](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/ECM_Pixie_Cluster_Pixels.ipynb) and [ECM_pixel_clustering_stats.ipynb](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/ECM_pixel_clustering_stats.ipynb)
-
-
+    * formatted_files - various files used as input for SpaceCat processing
+      * cell_distances_filtered.csv: data detailing linear distance between cell populations in an image ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/cell_neighbors_analysis-TONIC.ipynb))
+      * formatted_mixing_scores.csv: image level mixing score of various cell population combinations ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/Calculate_Mixing_Scores-TONIC.ipynb))
+      * fiber_stats_table.csv: image level fiber analysis ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/example_fiber_segmentation-TONIC.ipynb))
+      * fiber_stats_per_tile.csv: tile (512x512 pixel) level fiber analysis
+      * neighborhood_image_proportions.csv: K-means clusters aggregated per image ([code](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/example_neighborhood_analysis_script-TONIC.ipynb))
+      * neighborhood_compartment_proportions.csv: K-means clusters aggregated per compartment
+      * pixie_ecm_stats.csv: pixel cluster stats generated in [ECM_Pixie_Cluster_Pixels.ipynb](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/ECM_Pixie_Cluster_Pixels.ipynb) and [ECM_pixel_clustering_stats.ipynb](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/single_cell_analysis/ECM_pixel_clustering_stats.ipynb)
+      * ecm_cluster_stats.csv: kmeans stats generated in [4_ecm_preprocessing.py](https://github.com/angelolab/publications/blob/main/2024-Greenwald_Nederlof_etal_TONIC/feature_analysis/4_ecm_preprocessing.py)
 
 ## Data Structures
 In order to facilitate different analyses, there are a small number of distinct formats for storing data. 
@@ -162,6 +156,10 @@ In addition, there are often multiple levels of granularity in the clustering sc
 | TMA1_FOV1 |   2   |     Treg     |   5    |   2    |     0      |  5   | 
 | TMA2_FOV4 |   5   |    T cell    |   4    |   0    |     4      |  6   | 
 
+
+*adata*: This data structure is outputted from the SpaceCat pipeline, and contains all the computed feature tables (adata_processed.h5ad). See the anndata documentation for detailed information. In summary, adata.obs contains the cell level annotations, where each row is a unique cell, adata.X contains the protein expression data, adata.obsm contains the generated neighborhood matrices, and adata_processed.uns contains the individual tables for each feature type, as well as the combined table of all generated features.
+
+
 ## Analysis Files
 
 *harmonized_metadata*: This data frame details the various FOVs and their associated tissue and patient IDs, timepoint, etc.
@@ -189,9 +187,9 @@ In addition, there are often multiple levels of granularity in the clustering sc
 
 *cell_table_func_all*: A cell table containing all possible pairwise marker positivity data.
 
-*fov_features*: This file is a combination of all feature metrics calculated on a per image basis. The file *fov_features_filtered* is also produced, which is the entire feature file with any highly correlated features removed.
+*combined_feature_data*: This file is a combination of all feature metrics calculated on a per image basis. The file combined_feature_data_filtered is also produced, which is the entire feature file with any highly correlated features removed.
 
-The fov_features table aggregates features of many different types together, all of which are detailed in [Ouput Files](#Output-Files).
+The combined_feature_data table aggregates features of many different types together, all of which are detailed in adata_processed.uns
 
 | Tissue_ID | fov | raw_value | normalized_value |   feature_name    |      feature_name_unique       |  compartment  | cell_pop |   feature_type   |
 |:---------:|:---:|:---------:|:----------------:|:-----------------:|:------------------------------:|:-------------:|:--------:|:----------------:|
@@ -212,19 +210,22 @@ Alternatively, we could compare the granular cell type diversity of all immune c
 |    T2     | cancer_diversity  | cancer_diversity_cancer_border | cancer_border |  Cancer  |  -0.01   |   0.3   |      -0.6       |      1.1       |
 |    T3     | max_fiber_density |       max_fiber_density        |  stroma_core  |   all    |   -1.8   |   -16   |      -0.7       |      0.2       |
 
-The file *timepoint_evolution_features* details the difference in feature values between two distinct timepoints from the same patient.
+
+*timepoint_evolution_features*: This file is structured the same was as timepoint_features, but specifically details the difference in feature values between two distinct timepoints from the same patient.
+
+*excluded_features*: This table details compartment features that were removed when creating combined_feature_data_filtered due to high correlation with the image wide feature.
+
+*feature_ranking*: This table contains all features in the data ranked by significance and importance score.
 
 
-## Output Files
+## Feature Tables (adata_processed.uns)
 
-The individual feature data that combines into *fov_features* and *timepoint_features* can be found in the corresponding files detailed below.
-Each of the data frames in this section can be further stratified based on the feature relevancy and redundancy. The files below can have any of the following suffixes:
-* *_filtered*: features removed if there are less than 5 cells of the specified type
-* *_deduped*: redundant features removed
-* *_filtered_deduped*: both of the above filtering applied
+The individual feature data that combines into *combined_feature_data* and *timepoint_features* can be found in the corresponding data structures detailed below. The data frames also have a second version with the following “_filtered” suffix, in which features have been removed if there were less than 5 cells of the specified type; for functional marker statistics we also filtered out redundant features.
 
 
-1. *cluster_df*: This data structure summarizes key informaton about cell clusters on a per-image basis, rather than a per-cell basis. Each row represents a specific summary observation for a specific image of a specific cell type. For example, the number of B cells in a given image. The key columns are `fov`, which specifies the image the observation is from; `cell_type`, which specifies the cell type the observation is from; `metric`, which describes the specific summary statistic that was calculated; and `value`, which is the actual value of the summary statistic. For example, one statistic might be `cell_count_broad`, which would represent the number of cells per image, enumerated according the cell types in the `broad` clustering scheme. Another might be `cell_freq_detail`, which would be the frequency of the specified cell type out of all cells in the image, enumerated based on the detailed clustering scheme.
+1. *cluster_stats*: This data structure summarizes key information about cell clusters on a per-image basis, rather than a per-cell basis. Each row represents a specific summary observation for a specific image of a specific cell type; for example, the number of B cells in a given image. 
+
+   One statistic might be cell_cluster_broad_count, which would represent the number of cells per image, enumerated according the cell types in the broad clustering scheme. Another might be total_cell_freq, which would be the frequency of the specified cell type out of all cells in the image, enumerated based on the detailed clustering scheme.
 
 |   fov     | cell_type   | value |      metric       |    Timepoint    | 
 |:---------:|:-----------:|:-----:|:-----------------:|:---------------:| 
@@ -235,7 +236,7 @@ Each of the data frames in this section can be further stratified based on the f
 In addition to these core columns, metadata can be added to facilitate easy analysis, such as disease stage, prognosis, anatomical location, or other information that is useful for plotting purposes. 
 
 
-2. *functional_df*: This data structure summarizes information about the functional marker status of cells on a per-image basis. Each row represents the functional marker status of a single functional marker, in a single cell type, in a single image. The columns are the same as above, but with an additional `functional_marker` column which indicates which functional marker is being summarized. For example, one row might show the number of Tregs in a given image which are positive for Ki67, while another shows the proportion of cancer cells in an image that are PDL1+. 
+2. *functional_marker_stats*: This data structure summarizes information about the functional marker status of cells on a per-image basis. Each row represents the functional marker status of a single functional marker, in a single cell type, in a single image. The columns are the same as above, but with an additional `functional_marker` column which indicates which functional marker is being summarized. For example, one row might show the number of Tregs in a given image which are positive for Ki67, while another shows the proportion of cancer cells in an image that are PDL1+. 
 
 
 |    fov    | cell_type  | value |      metric       | functional marker |     Timepont      | 
@@ -244,7 +245,7 @@ In addition to these core columns, metadata can be added to facilitate easy anal
 | TMA1_FOV1 |    Treg    |  0.4  | cell_freq_detail  |       PDL1        |   pre_treatment   | 
 | TMA2_FOV4 | Macrophage |  20   | cell_count_detail |       TIM3        |   on_treatement   | 
 
-3. *morph_df*: This data structure summarizes information about the morphology of cells on a per-image basis.  Each row represents the morphological statistic, in a single cell type, in a single image.
+3. *morphology_stats*: This data structure summarizes information about the morphology of cells on a per-image basis.  Each row represents the morphological statistic, in a single cell type, in a single image.
 
 |    fov    | cell_type  |    value     | metric | functional marker |   Timepont    | 
 |:---------:|:----------:|:------------:|:------:|:-----------------:|:-------------:| 
@@ -252,7 +253,7 @@ In addition to these core columns, metadata can be added to facilitate easy anal
 | TMA1_FOV1 |    Treg    | area_nuclear |  0.4   | cell_freq_detail  | pre_treatment | 
 | TMA2_FOV4 | Macrophage |   nc_ratio   |   20   | cell_count_detail | on_treatement | 
 
-4. *distance_df*: This data structure summarizes information about the closest linear distance between cell types on a per-image basis.
+4. *linear_distance_stats*: This data structure summarizes information about the closest linear distance between cell types on a per-image basis.
 
 |   fov     |    cell_type     | linear_distance | value |      metric        |   Timepoint    | 
 |:---------:|:----------------:|:---------------:|:-----:|:------------------:|:--------------:| 
@@ -261,7 +262,7 @@ In addition to these core columns, metadata can be added to facilitate easy anal
 | TMA2_FOV4 | MacImmunerophage |   Macrophage    |  20   | cluster_broad_freq | on_treatement  | 
 
 
-5. *diversity_df*: This data structure summarizes information about the diversity of cell types on a per-image basis.
+5. *cell_diversity_stats*: This data structure summarizes information about the diversity of cell types on a per-image basis.
 
 |   fov     |    cell_type     |      diversity_feature       | value |      metric        |     Timepoint      | 
 |:---------:|:----------------:|:----------------------------:|:-----:|:------------------:|:------------------:| 
@@ -269,7 +270,7 @@ In addition to these core columns, metadata can be added to facilitate easy anal
 | TMA1_FOV1 |      Immune      |    diversity_cell_cluster    |  0.4  | cluster_broad_freq |   pre_treatement   | 
 | TMA2_FOV4 | MacImmunerophage | diversity_cell_cluster_broad |   2   | cluster_broad_freq |   on_treatement    | 
 
-6. *fiber_df / fiber_df_per_tile*: This data structure summarizes statistics about the collagen fibers at an image-level and also within 512x512 sized pixel crops of the image.
+6. *fiber_stats*: This data structure summarizes statistics about the collagen fibers at an image-level and also within 512x512 sized pixel crops of the image.
 
 | Tissue_ID |      fiber_metric       | mean | std |    Timepoint     | 
 |:---------:|:-----------------------:|:----:|:---:|:----------------:| 
@@ -277,6 +278,12 @@ In addition to these core columns, metadata can be added to facilitate easy anal
 | TMA1_FOV1 |        fiber_are        | 270  | 30  |  pre_treatement  | 
 | TMA2_FOV4 | fiber_major_axis_length |  35  |1.9  |  on_treatement   | 
 
-7. *neighborhood_image_proportions / neighborhood_compartment_proportions*: These data files detail the proportion of cells assigned to each kmeans cluster in the image / in each compartment in each image. 
+7. *kmeans_cluster_stats / kmeans_cluster_cancer_core_stat/ etc*: These data files detail the proportion of cells assigned to each kmeans cluster in the image / in each compartment in each image. 
 
-8. *formatted_mixing_scores*: This file contains the mixing scores calculated per image for various cell population combinations.
+8. *mixing_score_stats*: This file contains the mixing scores calculated per image for various cell population combinations.
+
+9. *region_diversity_stats*: This data structure summarizes information about the diversity of intermediate cell type proportions within the broader cell type category.
+
+10. *ecm_fraction_stats / ecm_cluster_stats / pixie_ecm_stats*: These data frames summarize ECM statistics such as the fraction of ECM in the tissue, as well as different regions of the ECM identified by K-means clustering and Pixie clustering individually.
+
+11. *compartment_area_stats / compartment_area_ratio_stats*: These data contain information about the proportions of the various compartments in the tissue (cancer core, cancer border, stroma core, and stroma border); additionally we look at the pairwise ratios of these values.

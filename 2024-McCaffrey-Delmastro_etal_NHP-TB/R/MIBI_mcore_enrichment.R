@@ -1,26 +1,30 @@
-# MIBI_metabolic_zone_enrichment.R
+# MIBI_mcore_enrichment.R
+# Created by: Erin McCaffrey
+# 
+# Overview: This script quantifies the enrichment score between the myeloid core
+# and the peripheral/lymphocytic cuff zone of the granuloma for all cell subsets. 
+# It visualizes these data as boxplots across samples. 
 
 library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(forcats)
 
-##..Import data..##
+##..Step 1: Import data..##
 
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
 data <- read.csv('cell_cohort_data_metabolic_zones.csv')
 
-##..Drop unassigned cells..##
+##..Step 2: Drop unassigned cells..##
 data <- droplevels(data [!data $pheno_corrected == 'Unassigned',])
 
-##..Preprocess..##
+##..Step 3: Preprocess..##
 
 # create a column for myeloid core and not myeloid core
 data$mcore <- 0
 data[data$glyco_zone == 1 | data$IDO1_zone ==1, ]$mcore <- 1
 mcore_cells <- data[data$mcore == 1, ]
 
-##..Get enrichment score..##
+##..Step 4: Get enrichment score..##
 
 # total number of cells
 totals_overall <- as.data.frame(table(data$sample, data$pheno_corrected))
@@ -68,7 +72,7 @@ all_data_area$freq_enrichment <- log2(all_data_area$mcore_freq_density / all_dat
 # remove Inf rows
 plot_data <- all_data_area[is.finite(all_data_area$enrichment),]
 
-##..Visualize enrichment score..##
+##..Step 6: Visualize enrichment score..##
 
 # all cells
 color_key <- read.csv("./keys/cell_color_key.csv")

@@ -1,8 +1,10 @@
 # MIBI_spatial_niche_marker_analysis.R
+# Created by: Erin McCaffrey
 # Date created: 03/24/24
-# This script takes the niche output from Jolene for functional marker expression.
+#
+# Overview: This script takes the QUICHE output for functional marker expression.
 # It generates the plot Jolene provided broken down by niche and cell subset.
-# it also generates one that is a mean of all cell types in a niche. 
+# It also generates one that is a mean of all cell types in a niche. 
 
 library(reshape2)
 library(tidyverse)
@@ -15,16 +17,15 @@ library(ggpubr)
 library(data.table)
 library(EnhancedVolcano)
 
-##..Read in the data..##
+##..Step 1: Read in the data..##
 
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2/")
 sc_data<-read.csv('cohort_cell_table.csv')
 niche_data<-read.csv('./spatial_analysis/QUICHE/v2/tb_annotated_table_tb_binary_updated_all-sig.csv')
 
-##..Combine the sc data and niche data..##
+##..Step 2: Combine the sc data and niche data..##
 sc_data <- merge(niche_data, sc_data, by = c('tiled_label','sample','centroid.x','centroid.y'))
 
-##..Get the list of niches  ..##
+##..Step 3: Get the list of niches  ..##
 data_summary <- niche_data %>%
   group_by(new_label) %>%
   summarize(median = median(logFC))
@@ -38,7 +39,7 @@ low_enriched <- data_summary %>%
 diff_niches <- rbind(high_enriched, low_enriched)
 diff_niches_ordered <- arrange(diff_niches, median)
 
-##..Adjust single cell data for pSTAT3..##
+##..Step 4: Adjust single cell data for pSTAT3 and Coll1..##
 
 pSTAT3_pos <- c('sample53','sample59','sample4','sample17','sample55','sample16',
                 'sample54','sample45','sample32','sample7','sample18','sample24',
@@ -49,42 +50,13 @@ coll_pos <- c('sample16','sample17','sample18','sample32','sample35',
 sc_data[!sc_data$sample %in% pSTAT3_pos, ]$pSTAT3 <- NA
 sc_data[!sc_data$sample %in% coll_pos, ]$Collagen1 <- NA
 
-# ##..Split apart the cell type column..##
-# 
-# sc_data$pheno_corrected <- sub('.*: ', '', sc_data$pheno_corrected)
-
-##..Filter the expression data to only include the niches..##
-
-# first need to separate the niche info
-# hmap_data_splt <- hmap_data %>% separate(pheno_corrected, into=c("niche", "null", "cell_type"), sep= " ")
-# hmap_data$niche <- hmap_data_splt$niche
-# 
-# hmap_summary <- hmap_data %>%
-#   group_by(niche) %>%
-#   summarise(across(everything(), list(mean)))
-
-##..Subset data by phenotype and/or niche..##
-
-# pheno <- 'Neutrophil'
-# niches <- c("CD14+_Mac_Mono__CD206+_Mac__Neutrophil",
-#             "CD11c+_Mac__CD8+Tcell__Neutrophil",
-#             "CD68+_Mac__FN1+_Mac__Neutrophil",
-#             "Bcell__CD14+CD11c+_Mac__Neutrophil",
-#             "HLADR+_APC__Neutrophil__VIM+Stroma")
-# hmap_data <- sc_data[sc_data$pheno_corrected == pheno &
-#                        sc_data$new_label %in% niches,]
-# hmap_data <- sc_data[sc_data$pheno_corrected == pheno,]
-
-##..Generate heatmap..##
+##..Step 5: Generate heatmap..##
 
 hmap_data <- sc_data
-# markers <- c('MMP9','CHIT1','GLUT1','pIRF3','FTL','IDO1','pS6','iNOS','pSTAT3')
 markers <- c('Arginase1', 'CD36', 'CHIT1', 'DC.LAMP', 'FTL', 'GLUT1', 'H3K9Ac', 
                      'H3K27me3', 'HLA.DR', 'HO.1', 'IDO1', 'IFNg', 'IL33', 'iNOS', 
                      'MMP9', 'pIRF3', 'pS6', 'pSMAD3', 'pSTAT1', 'pSTAT3','Fe','Collagen1')
-# markers <- names(sc_data[,2:22])
 groups <- unique(hmap_data$new_label)
-# groups_ordered <- groups[order(match(groups,diff_niches_ordered$new_label))]
 groups_ordered <- diff_niches_ordered$new_label
 
 hm_niche_markers <- matrix(, nrow = length(markers), ncol = length(groups_ordered))
@@ -98,7 +70,7 @@ colnames(hm_niche_markers) <- groups_ordered
 
 hm_niche_markers[is.na(hm_niche_markers)] <- 0
 
-##..Plot..##
+##..Step 6: Plot..##
 
 custom_pal_div<-c("#0E1949","#1E356C","#31508C","#4272AE","#6A93C6","#98B1DA",
                            "#C8D0EF","#F8F0FE","#F0C5D8","#E19EB0","#D17486",
@@ -112,9 +84,6 @@ heatmap.2(hm_niche_markers,
           dendrogram = "row",
           trace = "none",
           col = colfunc(100),
-          # col = rev(as.vector((brewer.spectral(100)))),
-          # col = (as.vector((ocean.delta(100)))),
-          # col = magma(256),
           density.info = 'none',
           key.title = '',
           sepwidth=c(0.01,0.01),      
@@ -122,11 +91,10 @@ heatmap.2(hm_niche_markers,
           colsep=0:ncol(hm_niche_markers),
           rowsep=0:nrow(hm_niche_markers),
           breaks=seq(-2.5,2.5, length.out=101))
-          # breaks=seq(-0.5,2.5, length.out=257))
 
-##..Evaluate effect size of cell-marker combos..##
+##..Step 7: Evaluate effect size of cell-marker combos..##
 
-# function from David Glass
+# function from wise oracle David Glass, PhD
 getEffectSize <- function(x, y, hedge=T) {
   # Calculates Hedge's g or Cohen's d effect size
   # Inputs:
@@ -169,14 +137,6 @@ data_summary <- niche_data %>%
 high_burden_niches <- data_summary[data_summary$median > 0, ]$new_label
 marker_data.m$niche_group <- "low_burden"
 marker_data.m[marker_data.m$new_label %in% high_burden_niches,]$niche_group <- "high_burden"
-
-# reshape to have 
-# marker_data.cast <- reshape2::dcast(marker_data.m,
-#                                     new_label ~ pheno_corrected + variable,
-#                                     value.var = "value",
-#                                     fun.aggregate = identity)
-# marker_data.cast$niche_group <- 'low_burden'
-# marker_data.cast[marker_data.cast$new_label %in% high_burden_niches, ]$niche_group <- 'high_burden'
 
 # generate effect size data
 
@@ -263,69 +223,3 @@ ggplot(data = stats.dt, aes(x = low.high.effect, y = -log10(low.high.adj.p.value
                      labels = c("Downregulated", "Not significant", "Upregulated")) + 
   ggtitle('Cell-marker Pairs in High versus Low Burden Niches') + 
   geom_text_repel(max.overlaps = Inf)
-
-
-# make a heatmap of the significant features 
-diff_marker_pairs <- stats.dt[stats.dt$diffexpressed %in% c('UP','DOWN'),]$label
-
-
-
-
-
-##..Evaluate log fold-change cell-marker pairs..##
-
-# generate cell-type - marker combo summaries for burden groups separately
-markers_low_burden <- marker_data.m[marker_data.m$niche_group == 'low_burden',] %>%
-  group_by(pheno_corrected, variable) %>%
-  summarize(mean_low = mean(value, na.rm = TRUE))
-
-markers_high_burden <- marker_data.m[marker_data.m$niche_group == 'high_burden',] %>%
-  group_by(pheno_corrected, variable) %>%
-  summarize(mean_high = mean(value, na.rm = TRUE))
-
-markers_all <- left_join(markers_low_burden, markers_high_burden, 
-                         by = c('pheno_corrected', 'variable'))
-
-markers_all$FC <- log2(markers_all$mean_high / markers_all$mean_low)
-
-# convert to heatmap
-markers.cast <- reshape2::dcast(markers_all,
-                                    pheno_corrected ~ variable,
-                                    value.var = "FC")
-markers.hmap <- as.matrix(markers.cast[,2:23])
-rownames(markers.hmap) <- markers.cast$pheno_corrected
-
-heatmap.2(markers.hmap,
-          scale = "none",
-          Colv = T, Rowv = T,
-          hclustfun = function(x) hclust(x, method="complete"),
-          dendrogram = "both",
-          trace = "none",
-          col = colfunc(100),
-          # col = rev(as.vector((brewer.spectral(100)))),
-          # col = (as.vector((ocean.delta(100)))),
-          # col = magma(256),
-          density.info = 'none',
-          key.title = '',
-          sepwidth=c(0.01,0.01),      
-          sepcolor="black",
-          colsep=0:ncol(markers.hmap),
-          rowsep=0:nrow(markers.hmap),
-          breaks=seq(-3,3, length.out=101))
-
-# plot relationsips as violins
-
-theme <- theme(strip.background = element_blank(),
-               panel.background = element_rect(colour = 'black', linewidth = 1, fill = 'white'),
-               panel.grid.major = element_blank(),
-               panel.grid.minor = element_blank())
-
-ggplot(marker_data.m, aes(x = niche_group, y = value, fill = pheno_corrected)) +
-  geom_violin(aes(fill = niche_group)) +
-  scale_fill_manual(values=c('#BE1E2D','#1B75BB')) +
-  facet_wrap(~variable, ncol = 6, scales = "free_y") +
-  theme +
-  stat_compare_means(method= "wilcox.test", label = "p.format") +
-  theme(legend.position = 'none') + 
-  labs(x="Niche Group") +
-  labs(y="Expression") 

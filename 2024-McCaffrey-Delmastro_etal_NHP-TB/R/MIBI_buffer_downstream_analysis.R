@@ -47,7 +47,6 @@ library(introdataviz)
 ###...Step 1: Preprocess...###
 
 # read in data
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
 buffer_data <- read.csv('buffer_data.csv')
 meta_data <- read.csv('./cohort_metadata/study_cohort_metadata.csv')
 necrosis_data <- read.csv('./spatial_analysis/radial/necrosis_distance_data.csv')
@@ -127,7 +126,7 @@ buffer_data_metabolic_combined <-  left_join(buffer_data_area_norm,
 ###...Step 2: Individual granuloma analysis...###
 
 # choose a granuloma
-gran <- 'sample33'
+gran <- 'sample46'
 
 # subset the data
 gran_data_raw <- buffer_data_filtered[buffer_data_filtered$sample == gran,]
@@ -193,15 +192,6 @@ plot_colors<-plot_colors[order(plot_colors$Pheno),]
 color<-as.vector(plot_colors$Hex)
 
 # plot
-# single_gran_cell_ridges <- ggplot(uncounted_gran_data, aes(x = buffer_num,
-#                                                            y = variable,
-#                                                            height = ..scaled..,
-#                                                            fill = variable)) +
-#   geom_density_ridges(stat = "density", alpha=0.8, adjust = 1.5) +
-#   scale_fill_manual(values=color) +
-#   theme_ridges()
-# single_gran_cell_ridges
-
 single_gran_cell_ridges <- ggplot(uncounted_gran_data, aes(x = buffer_num, 
                                                            y = variable, 
                                                            height = stat(density),
@@ -257,10 +247,8 @@ gran_data_factors_norm$IDO_percent <-gran_data_factors_norm$IDO_percent/max(gran
 # melt
 factor_data.m <- melt(gran_data_factors_norm,
                       id.vars = c('bin_num','buffer_num'),
-                      measure.vars = c('CD8.Tcell',
-                                       'CD4.Tcell',
-                                       'IDO_percent',
-                                       'glyco_percent'))
+                      measure.vars = c('IDO1',
+                                       'GLUT1'))
 
 # plot
 single_gran_factors <- ggplot(factor_data.m, aes(x=buffer_num, y=value)) + 
@@ -292,9 +280,6 @@ heatmap.2(hmap_data.t_reordered,
           dendrogram = "both",
           trace = "none",
           col = magma(256),
-          # col = cubehelix(256),
-          # col = rev(as.vector((brewer.rdbu(100)))),
-          # col = rev(as.vector((brewer.spectral(100)))),
           density.info = 'none',
           key.title = '',
           breaks=seq(-1,2.5, length.out=257))
@@ -323,7 +308,6 @@ color<-as.vector(plot_colors$Hex)
 
 # plot the cellular data in bulk and separately
 all_gran_bulk_cell <- ggplot(cellular_data_all.m, aes(x=as.numeric(bin_num), y=value, color = variable)) + 
-  # geom_point() + 
   geom_line() +
   theme_minimal() + 
   scale_color_manual(values = color)
@@ -332,7 +316,6 @@ all_gran_bulk_cell
 all_gran_individual_cell <- ggplot(cellular_data_all.m, aes(x=as.numeric(bin_num), y=value, color = variable)) + 
   geom_point() +
   geom_smooth(method = "loess", color = 'black') +
-  # geom_line() +
   theme_minimal() + 
   scale_color_manual(values = color) +
   theme(legend.position = 'None') +
@@ -367,51 +350,9 @@ plot_colors$Pheno<-factor(plot_colors$Pheno, levels = plot_populations)
 plot_colors<-plot_colors[order(plot_colors$Pheno),]
 color<-as.vector(plot_colors$Hex)
 
-# # plot ridges
-# all_gran_cell_ridges <- ggplot(uncounted_data_all, aes(x = buffer_num_norm, 
-#                                                            y = variable, 
-#                                                            height = stat(density),
-#                                                            fill = burden)) + 
-#   geom_density_ridges(stat = "binline", 
-#                       bins = 30,
-#                       draw_baseline = FALSE,
-#                       scale = 3,
-#                       alpha = 0.8) +
-#   scale_fill_manual(values=color) +
-#   theme_ridges() +
-#   coord_cartesian(clip = "off") 
-# all_gran_cell_ridges
-# 
-# all_gran_cell_ridges <- ggplot(uncounted_data_all, aes(x = buffer_num_norm,
-#                                                            y = variable,
-#                                                            height = ..scaled..,
-#                                                            fill = variable)) +
-#   geom_density_ridges(stat = "density", 
-#                       alpha=0.8, 
-#                       adjust = 1.5,
-#                       aes(fill = burden)) +
-#   theme_ridges() + 
-#   coord_cartesian(clip = "off") 
-# all_gran_cell_ridges
-# 
-# all_gran_cell_density <- ggplot(cellular_data_all.m, aes(buffer_num, fill = burden)) +
-#   stat_density(aes(weight = value, y = variable , height = after_stat(density)), 
-#                geom = 'density_ridges', position = 'identity', alpha = 0.8) + 
-#   theme_minimal() + 
-#   coord_cartesian(clip = "off") +
-#   facet_wrap(~variable, scales=c("free")) 
-# all_gran_cell_density
-
 # optionally subset the proteins for plotting
 protein_data_all_sub <- protein_data_all.m[protein_data_all.m$variable %in% plot_markers,]
-# 
-# # plot the protein data in bulk and individually
-# all_gran_bulk_protein <- ggplot(protein_data_all_sub, aes(x=buffer_num, y=value, color = variable)) + 
-#   geom_point() + 
-#   geom_line() +
-#   theme_minimal() 
-# all_gran_bulk_protein
-# 
+
 all_gran_individual_protein <- ggplot(protein_data_all_sub, aes(x=bin_num, y=value)) +
   geom_point(color = 'grey') +
   geom_smooth(method = "loess", color = 'black') +
@@ -421,11 +362,9 @@ all_gran_individual_protein <- ggplot(protein_data_all_sub, aes(x=bin_num, y=val
 all_gran_individual_protein
 
 # create a pseudotime-style heatmap
-# data_subset <- buffer_data_area_norm[buffer_data_area_norm$burden == 'low', ]
 data_subset <- buffer_data_area_norm
 hmap_data_all <- as.matrix(data_subset[,names(data_subset) %in% hmap_cols])
 
-# nrows = max(data_subset$buffer_num)
 rows <- unique(data_subset$buffer_num_norm_binned)
 rows <- rows[order(rows)]
 nrows <- length(unique(data_subset$buffer_num_norm_binned))
@@ -451,9 +390,6 @@ heatmap.2(hm_all_clusters.t_reordered,
           dendrogram = "none",
           trace = "none",
           col = magma(256),
-          # col = cubehelix(256),
-          # col = rev(as.vector((brewer.rdbu(100)))),
-          # col = rev(as.vector((brewer.spectral(100)))),
           density.info = 'none',
           key.title = '',
           breaks=seq(-1,2, length.out=257))

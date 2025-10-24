@@ -1,6 +1,7 @@
-# TBMIBIplotBlockMetaData.R
+# MIBI_plot_block_data.R
 # Author: Erin McCaffrey 
 # Date created: 210609
+#
 # Overview: This script plots the meta data for the cohort
 
 require(dplyr)
@@ -14,34 +15,39 @@ library(pals)
 library(ggpubr)
 library(ggstatsplot)
 
-##..Import data..##
-setwd('/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2')
+##..Step 1: Import data..##
+
 data_gran <- read.csv("./cohort_metadata/study_cohort_metadata.csv")
 data_animal <- read.csv("./cohort_metadata/study_cohort_animal_metadata.csv")
 animal_color_key <- read.csv("./keys/animal_color_key.csv")
 
-##..Append granuloma age data..##
+##..Step 2: Append granuloma age data..##
+
 data_animal$Weeks_Necropsy <- data_animal$days_to_necropsy/7
 data_gran$Week_Necropsy <- data_animal$Weeks_Necropsy[match(data_gran$Animal,data_animal$Animal)]
 data_gran <- data_gran %>% relocate(Week_Necropsy, .before=Granuloma)
 data_gran$gran_age <- data_gran$Week_Necropsy - data_gran$Week_Detected
 data_gran <- data_gran %>% relocate(gran_age, .before=Granuloma)
 
-##..Add a column to reflect high v low burden from median cutoff..##
+##..Step 3: Add a column to reflect high v low burden from median cutoff..##
+
 meta_data <- data_gran
 thresh <- median(meta_data$log_CFU)            
 meta_data$burden <- 'high'
 meta_data$burden[meta_data$log_CFU < thresh] <- 'low'
 meta_data <- meta_data %>% relocate(burden, .before=CT_size)
 
-##..Melt..##
+##..Step 4: Melt..##
+
 measure_vars <- c("gran_CFU", "CT_size", "FDG_SUV", "Week_Detected", "gran_age", 
                  "Week_Necropsy", "Granuloma", "Multifocal", "log_CFU",
                  "Necrotic", "Non.necrotic", "Fibrinoid_debri", "Fibrosis", 
                  "Mineralization", "Collagenization", "Neutrophillic", "Early_Evolving")
 data_gran.m<-reshape2::melt(data_gran, id.vars = c('Animal_Code','sample'), measure.vars = measure_vars )
 
-##..Plot number of granulomas per animal in descending order..##
+##..Step 5: Plot data..##
+
+# plot number of granulomas per animal in descending order..##
 n_gran_data<-as.data.frame(table(data_gran$Animal))
 colnames(n_gran_data)<-c('Animal','n_gran')
 median_CFU<-data_gran %>%
@@ -60,7 +66,7 @@ ggplot(n_gran_data_CFU, aes(x=reorder(Animal, -n_gran), y=n_gran, fill=log_med_C
   labs(y="# Specimens", x='Animal') 
 
 
-##..Plot animal versus CFU with one point per gran in ascending mean order..##
+# plot animal versus CFU with one point per gran in ascending mean order
 plot_data<-data_gran
 plot_data$gran_CFU<-as.numeric(plot_data$gran_CFU) + 1
 CFU_plot<-ggplot(plot_data, aes(x=reorder(as.factor(Animal_Code), -gran_CFU), 
@@ -75,16 +81,7 @@ CFU_plot<-ggplot(plot_data, aes(x=reorder(as.factor(Animal_Code), -gran_CFU),
   theme(axis.text.x=element_text(angle=45, hjust=1))
 CFU_plot
 
-# ##..Extract color key to conserve per NHP..##
-# g <- ggplot_build(CFU_plot)
-# color<-unique(g$data[[1]]["colour"])
-# Animal<-unique(plot_data$Animal)
-# animal_color_key<-data.frame(Animal, color)
-# animal_code_pairs <- unique(plot_data[,names(plot_data) %in% c('Animal','Animal_Code')])
-# animal_color_key<-left_join(animal_code_pairs, animal_color_key, by = c('Animal'))
-# write.csv(animal_color_key, './keys/animal_color_key.csv', row.names = F)
-
-##..Plot other granuloma data..##
+# plot other granuloma data:
 
 # CT size
 plot_data<-na.omit(data_gran.m[data_gran.m$variable=="CT_size",])
@@ -124,7 +121,6 @@ ggplot(plot_data, aes(x=variable, y=as.numeric(value), color = as.factor(Animal_
 
 # CFU/gran
 plot_data<-na.omit(data_gran.m[data_gran.m$variable=="log_CFU",])
-# plot_data$value<-as.numeric(plot_data$value)+1
 
 plot_animals<-levels(factor(plot_data$Animal_Code))
 plot_colors<-droplevels(animal_color_key[animal_color_key$Animal_Code %in% plot_animals,])
@@ -135,7 +131,6 @@ color<-as.vector(plot_colors$colour)
 ggplot(plot_data, aes(x=variable, y=as.numeric(value), color = as.factor(Animal_Code))) +
   geom_quasirandom(width=0.1, size=2) +
   stat_summary(fun=median, geom="crossbar", width=0.3, color="black") +
-  # scale_y_continuous(trans='log10') +
   theme_bw() +
   scale_color_manual(values = color) +
   labs(y="CFU", x="n=52 granulomas") +
@@ -159,7 +154,7 @@ ggplot(plot_data, aes(x=variable, y=as.numeric(value), color = as.factor(Animal_
   labs(y="Granuloma Age", x="n=51 granulomas") +
   theme(panel.grid=element_blank(), axis.text.x=element_blank())
 
-##..Look at CFU correlations with features..##
+##..Step 6: Evaluate at CFU correlations with features..##
 
 # run individual correlations
 corr.test(data_gran$gran_CFU, data_gran$gran_age, method = 'spearman')
@@ -196,7 +191,7 @@ ggplot(corr_data, aes(x=log_CFU, y=as.numeric(value)), color = as.factor(Animal_
         legend.position = "None") +
   facet_wrap(.~variable, scale='free_y')
 
-##..Look at any CFU differences based on histological status..##
+##..Step 7: Evaluate CFU differences based on histological status..##
 
 plot_animals<-levels(factor(data_gran$Animal_Code))
 plot_colors<-droplevels(animal_color_key[animal_color_key$Animal_Code %in% plot_animals,])
@@ -223,7 +218,7 @@ shapiro.test(data_gran$log_CFU)
 anova <- aov(log_CFU ~ as.factor(Necrosis_Score), data = data_gran)
 summary(anova)
 
-##..Plot granuloma data per animal..##
+##..Step 8: Plot granuloma data per animal..##
 
 # append the animal code
 data_animal <- left_join(data_animal, 
@@ -263,5 +258,5 @@ ggplot(plot_data, aes(x=as.factor(Animal_Code), y=as.numeric(value)), color = as
         axis.ticks.x=element_blank()) +
   facet_wrap(.~variable, scale='free_y')
 
-##..Export updated metadata..##
+##..Step 9: Export updated metadata..##
 write.csv(data_gran, 'study_cohort_metadata.csv', row.names = F) 

@@ -1,6 +1,8 @@
 # MIBI_spatial_niche_analysis.R
+# Created by: Erin McCaffrey
 # Date created: 03/21/24
-# This script takes the niche output from Jolene and visualizes the differentially
+#
+# Overview: This script takes the niche output from Jolene and visualizes the differentially
 # abundant niches between controlling and non-controlling granulomas. It also
 # visualizes the expression of markers in each niche in a heatmap format.
 
@@ -18,11 +20,13 @@ library(UpSetR)
 library(ggpubr)
 library(ComplexHeatmap)
 
-##..Read in the data..##
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2/")
+##..Step 1: Read in the data..##
+
 data<-read.csv('./spatial_analysis/QUICHE/v2/tb_annotated_table_tb_binary_updated_all-sig.csv')
 
-##..Assign the niches as being a high or low burden-enriched niche..##
+##..Step 2: Proprocess..##
+
+# Assign the niches as being a high or low burden-enriched niche..##
 data_summary <- data %>%
   group_by(new_label) %>%
   summarize(median = median(logFC))
@@ -33,11 +37,11 @@ low_burden_niches <- data_summary[data_summary$median < 0, ]$new_label
 data$enrichment <- 'high'
 data[data$new_label %in% low_burden_niches, ]$enrichment <- 'low'
 
-##..Create binary significance level..##
+# Create binary significance variable
 data$sig <- 'True'
 data[data$SpatialFDR >= 0.05, ]$sig <- 'False'
 
-##..Optionally filter to only include the top 50 differential..##
+# Optionally filter to only include the top 50 differential
 high_enriched <- data_summary %>%
   filter(rank(desc(median))<=15)
 
@@ -48,7 +52,7 @@ diff_niches <- c(high_enriched$new_label, low_enriched$new_label)
 # plot_data <- data[data$new_label %in% diff_niches, ]
 plot_data <- data
 
-##..Plot as ascending violins..##
+##..Step 3: Plot as ascending violins..##
 
 ggplot(plot_data, aes(reorder(new_label, logFC, FUN = median), y=logFC, fill=enrichment)) +
   geom_violin(trim = FALSE, color = NA, scale = "width") +
@@ -64,38 +68,10 @@ ggplot(plot_data, aes(reorder(new_label, logFC, FUN = median), y=logFC, fill=enr
   labs(y="log2FC") 
 
 
-##..Append single cell data..##
+##..Step 4: Append single cell data..##
 
 sc_data <- read.csv('cell_cohort_data_metabolic_zones.csv')
 niche_data_sc <- merge(data, sc_data, by = c('tiled_label','sample'))
-
-##..Generate heatmap of niches by cell frequency..##
-
-niche_cell_freq <- niche_data_sc %>% 
-  group_by(new_label, .drop = F ) %>%
-  count(pheno_corrected) %>%
-  mutate(freq_of_total = prop.table(n)) %>%
-  rename('variable' = 'pheno_corrected') %>%
-  mutate(category = 'pheno_of_total')
-
-niche_cell_hmap <- dcast(niche_cell_freq, new_label ~ variable, value.var = 'freq_of_total')  
-niche_cell_hmap[is.na(niche_cell_hmap)] <- 0
-niche_cell_hmap.m <- as.matrix(niche_cell_hmap[,2:20])
-rownames(niche_cell_hmap.m) <- niche_cell_hmap$new_label
-
-hmap <- heatmap.2(niche_cell_hmap.m[diff_niches,],
-          Colv = T, Rowv = T,
-          hclustfun = function(x) hclust(x, method="complete"),
-          dendrogram = "both",
-          trace = "none",
-          col = rev(as.vector((brewer.spectral(100)))),
-          density.info = 'none',
-          key.title = '',
-          sepwidth=c(0.01,0.01),      
-          sepcolor="white",
-          colsep=0:ncol(niche_cell_hmap.m),
-          rowsep=0:nrow(niche_cell_hmap.m),
-          breaks=seq(0,1, length.out=101))
 
 ##..Plot binary matrix of the niche cell members..##
 
@@ -147,30 +123,7 @@ combo_mat <- make_comb_mat(t(niche_members_ordered))
 upset(as.data.frame(t(niche_members_ordered)), 
       nsets = 30)
 
-##..Determine niche clustering to choose representative niches..##
-
-dist_mat <- dist(niche_cell_hmap, method="euclidean")
-hc <- hclust(dist_mat, method = 'complete')
-plot(hc)
-dend <- as.dendrogram(hc)
-plot(dend)
-dend_19 <- color_branches(dend, h = 0.55)
-plot(dend_19)
-groups <- as.data.frame(cutree(hc, k = 19))
-groups$new_label <-rownames(groups)
-colnames(groups) <- c('new_label','cluster')
-
-scree_data <- hc$height %>% as_tibble() %>%
-  add_column(groups = length(hc$height):1) %>%
-  rename(height=value)
-
-ggplot(scree_data, aes(x=groups, y=height)) +
-  geom_point() +
-  geom_line() +
-  geom_vline(xintercept = 19) +
-  theme_minimal()
-
-##..Define metabolic score of each niche..##
+##..Step 5: Define metabolic score of each niche..##
 
 niche_IDO_count <- niche_data_sc %>% 
   group_by(new_label) %>%
@@ -191,40 +144,7 @@ niche_metabolic_freq$IDO_freq <- niche_metabolic_freq$n_IDO1_zone / niche_metabo
 niche_metabolic_freq$metabolic_enrichment <- log2(niche_metabolic_freq$n_glyco_zone /
                                                     niche_metabolic_freq$n_IDO1_zone)
 
-# reorder to match the beeswarm plot
-data_ordered <- data %>% 
-  group_by(new_label) %>% 
-  mutate(m = median(logFC)) %>% 
-  arrange(desc(m)) %>% select(-m)
-niche_order <- rev(unique(data_ordered$new_label))
-
-niche_metabolic_freq <- niche_metabolic_freq %>%
-  mutate(across(new_label, factor, levels=niche_order))
-
-# optionally subset
-# metabolic_plot_data <- niche_metabolic_freq[niche_metabolic_freq$new_label %in% diff_niches, ]
-metabolic_plot_data <- niche_metabolic_freq
-
-# plot
-fill <- colorRampPalette(c("white", "#0022F4"))(n=100)
-ggplot(metabolic_plot_data, aes(x = new_label, y = 1, fill = IDO_freq)) + 
-  scale_fill_gradientn(limits=c(0, max(niche_metabolic_freq$IDO_freq)), colours=fill) +
-  theme_bw() +
-  geom_tile() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        axis.title.x=element_blank(), axis.ticks.x=element_blank()) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-fill <- colorRampPalette(c("white", "#00F422"))(n=100)
-ggplot(metabolic_plot_data, aes(x = new_label, y = 1, fill = glyco_freq)) + 
-  scale_fill_gradientn(limits=c(0, max(niche_metabolic_freq$glyco_freq)), colours=fill) +
-  theme_bw() +
-  geom_tile() +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        axis.title.x=element_blank(), axis.ticks.x=element_blank()) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-##..Compare metabolic enrichment in high versus low burden-enriched niches..##
+##..Step 6: Compare metabolic enrichment in high versus low burden-enriched niches..##
 
 # append the enrichment information
 niche_metabolic_freq$group <- 'high_burden'

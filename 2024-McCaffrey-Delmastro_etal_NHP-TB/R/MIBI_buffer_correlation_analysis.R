@@ -2,7 +2,13 @@
 # Date created: 08/23/24
 # Created by: Erin McCaffrey
 #
-# Overview: This script evaluates correlations between buffer features
+# Overview: This script reads on the buffer features for each sample, which
+# comprises both cellular densities, protein expression patterns, and the 
+# portion of each buffer belonging to the normoxic versus hypoxic zones. It then
+# generates buffer-by-buffer correlations for all features and visualizes those
+# in a heatmap. 
+
+# necessary libraries
 
 library(Hmisc)
 library(WGCNA)
@@ -20,7 +26,6 @@ library(viridis)
 ###...Step 1: Preprocess...###
 
 # read in the data
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
 buffer_feature_data <- read.csv('all_grans_buffer_features.csv')
 
 # generate a metabolic enrichment

@@ -1,4 +1,5 @@
-# MIBI_macrophage_composition_analysis.R
+# MIBI_CD11c_Mac_analysis.R
+# Date created: 12/21/2023
 # Author: Erin McCaffrey
 #  
 # Overview: Based on the correlation between CFU and the abudnace of CD11c+ Macrophages, 
@@ -13,71 +14,77 @@ library(ggpubr)
 devtools::install_github("psyteachr/introdataviz")
 library(introdataviz)
 
-## Read in data ##
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
+##..Step 1: Read in data ##
+
 data<-read.csv('cell_stats_all_samples_meta_data.csv')
 data<-droplevels(data[data$category == 'pheno_of_total',])
 data<-tibble::rowid_to_column(data, "ID")
+animal_color_key <- read.csv("./keys/animal_color_key.csv")
 
-## Create quartiles for CFU ##
-# data <- data %>% mutate(CFU_q = cut(log_CFU, quantile(log_CFU, probs = c(0, 1/3, 2/3, 1)), include.lowest=TRUE, labels=FALSE))
-data <- data %>% mutate(CFU_q = cut(log_CFU, quantile(log_CFU), include.lowest=TRUE, labels=FALSE))
+##..Step 2: Subset to only include macrophages/monocytes..##
 
-## Subset to only include macrophages ##
 macs <- c("CD11c+_Mac","CD14+CD11c+_Mac","CD14+_Mac_Mono","CD163+_Mac","CD206+_Mac","CD68+_Mac",
           "FN1+_Mac",'giant_cell')
 data_mac <- droplevels(data[data$variable %in% macs,])
 
-## Separate count and density data ##
-count_data<-reshape2::dcast(data_mac, sample + log_CFU + burden + CFU_q ~ variable, value.var = "n", fun.aggregate = sum)
-density_data<-reshape2::dcast(data_mac, sample + log_CFU + burden + CFU_q ~ variable, value.var = "cell_density", fun.aggregate = sum)
+##..Step 3: Separate count and density data..##
 
-## Append total macrophages ##
+count_data<-reshape2::dcast(data_mac, sample + log_CFU + burden + Animal_Code ~ variable, value.var = "n", fun.aggregate = sum)
+density_data<-reshape2::dcast(data_mac, sample + log_CFU + burden + Animal_Code ~ variable, value.var = "cell_density", fun.aggregate = sum)
+
+##..Step 4: Append total macrophages..##
+
 count_data <- count_data %>%
-  mutate(total_macs = rowSums(select(.,5:12)))
+  mutate(total_macs = rowSums(select(.,6:13)))
 
 freq_data <- count_data %>% 
-  mutate_at(vars(5:12),function(i)i/.$total_macs)
+  mutate_at(vars(6:13),function(i)i/.$total_macs)
 
-## Melt for easy plotting ##
-freq_data.m <- reshape2::melt(freq_data, id.vars = c('sample', 'burden', 'log_CFU','CFU_q'))
-density_data.m <- reshape2::melt(density_data, id.vars = c('sample', 'burden', 'log_CFU','CFU_q'))
+##..Step 5: Melt for easy plotting..##
 
-## Plot ##
+freq_data.m <- reshape2::melt(freq_data, id.vars = c('sample', 'burden', 'log_CFU','Animal_Code'))
+density_data.m <- reshape2::melt(density_data, id.vars = c('sample', 'burden', 'log_CFU','Animal_Code'))
+
+##..Step 6: Plot..##
+
 plot_data <- freq_data.m[!freq_data.m$variable %in% c('total_macs','gran_CFU'),]
+
 ggplot(data = plot_data, aes(x = fct_reorder(as.factor(variable), value,.fun=median,.desc=TRUE), 
                              value, fill=burden)) +
-  geom_boxplot(width = 0.75, alpha = .6, fatten = NULL, show.legend = TRUE) +
+  geom_boxplot(width = 0.75, alpha = .6, fatten = NULL, show.legend = TRUE, outliers = FALSE) +
+  scale_color_manual(values = color) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", show.legend = F, 
                position = position_dodge(.75)) +
   stat_compare_means(aes(group = burden), method= "wilcox.test", label = "p.format") +
+  geom_jitter(aes(color = Animal_Code), width = 0.2, size = 2, show.legend = TRUE) +
   theme_bw() +
-  # theme(legend.position = "none") +
   labs(x = 'Cell Type') + 
   labs(y = 'Frequency of Total Macrophages') +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.x=element_blank(), 
         axis.text.x = element_text(angle=35,hjust=1)) 
 
-## Plot between quartiles ##
-plot_data <- freq_data.m[!freq_data.m$variable %in% c('total_macs','gran_CFU'),]
-plot_data <- plot_data[plot_data$CFU_q %in% c(1,3),]
-ggplot(data = plot_data, aes(x = fct_reorder(as.factor(variable), value,.fun=median,.desc=TRUE), 
-                             value, fill=as.factor(CFU_q))) +
-  geom_boxplot(width = 0.75, alpha = .6, fatten = NULL, show.legend = TRUE) +
-  stat_summary(fun.data = "mean_se", geom = "pointrange", show.legend = F, 
-               position = position_dodge(.75)) +
-  stat_compare_means(aes(group = burden), method= "wilcox.test", label = "p.format") +
+## Plot a version faceted by subset with the animal data points shown ##
+plot_animals<-levels(factor(plot_data$Animal_Code))
+plot_colors<-droplevels(animal_color_key[animal_color_key$Animal_Code %in% plot_animals,])
+plot_colors$Animal<-factor(plot_colors$Animal_Code, levels = plot_animals)
+plot_colors<-plot_colors[order(plot_colors$Animal_Code),]
+color<-as.vector(plot_colors$colour)
+
+ggplot(data = plot_data, aes(x = burden, y = value)) +
+  geom_boxplot(show.legend = TRUE, outliers = FALSE) +
+  geom_jitter(aes(color = Animal_Code), width = 0.2, size = 2, show.legend = TRUE) +
+  scale_color_manual(values = color) +
   theme_bw() +
-  # theme(legend.position = "none") +
+  theme(legend.position = "none") +
   labs(x = 'Cell Type') + 
   labs(y = 'Frequency of Total Macrophages') +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.x=element_blank(), 
-        axis.text.x = element_text(angle=35,hjust=1)) 
+        axis.text.x = element_text(angle=35,hjust=1)) +
+  facet_wrap(~ variable, scales = "free_y", ncol = 2)
 
 ##..Generate log2(FC) between the high versus low burden grans..##
 summary_data <- freq_data[,!names(freq_data) %in% c('sample',
                                                     'log_CFU',
-                                                    'CFU_q',
                                                     'total_macs')]
 data_summary <- summary_data %>%
   group_by(burden) %>%

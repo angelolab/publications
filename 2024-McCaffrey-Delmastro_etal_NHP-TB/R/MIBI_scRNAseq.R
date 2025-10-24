@@ -1,7 +1,10 @@
-# MIBI_scRNAseq.R
+# NHP_TB_scRNAseq.R
+# Created by: Erin McCaffrey
 # Date created: 04/24/24
-# This script takes the output of the scRNAseq analysis from Bryan and plots
-# the data. 
+#
+# Overview: This script conducts analysis of the scRNAseq data from Peters et al
+# using outputs of the pathway enrichment analyses and differential gene
+# expresion analysis provided by the original study authors. 
 
 library(EnhancedVolcano)
 library(ggplot2)
@@ -12,8 +15,8 @@ library(reshape2)
 library(cowplot)
 library(gplots)
 
-##..Read in the data..##
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2/scRNAseq")
+##..Step 1: Read in the data..##
+
 deg_data <- read.csv('RM2_vs_RM3.csv')
 
 IDO1_sigdb_data <- read.csv('up_in_RM3_MSigDB.csv')
@@ -24,7 +27,7 @@ hypoxia_kegg_data <- read.csv('RM2_vs_RM3_KEGG.csv')
 
 metabolic_scores <- read.csv('v2_TableS6_MetabolicPathwayActivities.csv')
 
-##..Generate a volcano from the deg data..##
+##..Step 2: Generate a volcano from the deg data..##
 
 keyvals <- ifelse(deg_data$avg_log2FC < -1 & deg_data$p_val_adj < 0.05, 'blue',
                   ifelse(deg_data$avg_log2FC > 1 & deg_data$p_val_adj < 0.05, 'green','black'))
@@ -58,7 +61,7 @@ EnhancedVolcano(deg_data,
                 xlab = 'log2FC',
                 xlim = c(-5,5))
 
-##..Generate a bubble plot for the pathway data..##
+##..Step 3: Generate a bubble plot for the pathway data..##
 
 IDO1_kegg_data$log_p <- -log10(IDO1_kegg_data$Adjusted.P.value)
 
@@ -81,11 +84,6 @@ hypoxia_sigdb_data <- hypoxia_sigdb_data %>%
   arrange(desc(Odds.Ratio))
 hypoxia_sigdb_data$Term <- fct_inorder(hypoxia_sigdb_data$Term) %>% fct_rev()
 
-# IDO1_sigdb_data$group <- 'IDO1_macs'
-# hypoxia_sigdb_data$group <- 'hypoxia_macs'
-# 
-# all_sigdb_data <- rbind(IDO1_sigdb_data, hypoxia_sigdb_data)
-
 max_score <- max(hypoxia_sigdb_data$Combined.Score)
 max_p <- max(hypoxia_sigdb_data$log_p)
 
@@ -105,7 +103,7 @@ IDO1_plot
 
 cowplot::plot_grid(hypoxia_plot, IDO1_plot)
 
-##..Plot the metabolic score data..##
+##..Step 4: Plot the metabolic score data..##
 
 # transform the data to have the scores by population
 metabolic_scores_cast <- dcast(metabolic_scores, int_level_2 ~ source, value.var = c('score'))
@@ -141,9 +139,6 @@ heatmap.2(heatmap_data,
           dendrogram = "col",
           trace = "none",
           col = colfunc(100),
-          # col = rev(as.vector((brewer.spectral(100)))),
-          # col = (as.vector((ocean.delta(100)))),
-          # col = magma(256),
           density.info = 'none',
           key.title = '',
           sepwidth=c(0.01,0.01),      
@@ -151,5 +146,4 @@ heatmap.2(heatmap_data,
           colsep=0:ncol(t(hm_niche_markers)),
           rowsep=0:nrow(t(hm_niche_markers)),
           breaks=seq(-2.5,2.5, length.out=101))
-# breaks=seq(-0.5,2.5, length.out=257))
 

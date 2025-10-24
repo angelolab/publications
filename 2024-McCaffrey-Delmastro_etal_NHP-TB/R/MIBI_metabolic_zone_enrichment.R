@@ -1,29 +1,33 @@
-# MIBI_mcore_enrichment.R
+# MIBI_metabolic_zone_enrichment.R
+# Created by: Erin McCaffrey
+#
+# Overview: This script determines the metabolic zone enrichment for all
+# cells infiltrating the myeloid core. Once calculating this value, it visualizes
+# the data as boxplots across samples.
 
 library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(forcats)
 
-##..Import data..##
+##..Step 1: Import data..##
 
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
 data <- read.csv('cell_cohort_data_metabolic_zones.csv')
 
-##..Drop unassigned cells..##
+##..Step 2: Preprocess..##
+
+# drop unassigned cells
 data <- droplevels(data [!data $pheno_corrected == 'Unassigned',])
 
-##..Preprocess..##
-
-# for now drop the double-zone cells, will run the tiebreaker function later
+# assign double-zone cells as hypoxic (these were true 50-50 area splits given the 
+# assignment script did have an area-based tiebreaker function)
 double_pos_rows <- rownames(data[data$glyco_zone == 1 & data$IDO1_zone ==1, ])
 double_neg_rows <- rownames(data[data$glyco_zone == 0 & data$IDO1_zone == 0, ])
-# drop_rows <- c(double_pos_rows, double_neg_rows)
 data[(row.names(data) %in% double_pos_rows),]$IDO1_zone <- 0
 drop_rows <- c(double_neg_rows)
 metabolic_cells <- data[!(row.names(data) %in% drop_rows), ]
 
-##..Get enrichment score..##
+##..Step 3: Get enrichment score..##
 
 # total number of cells
 totals_overall <- as.data.frame(table(data$sample, data$pheno_corrected))
@@ -78,7 +82,7 @@ all_data_area$freq_enrichment <- log2(all_data_area$glyco_freq_density / all_dat
 # remove Inf rows
 plot_data <- all_data_area[is.finite(all_data_area$enrichment),]
 
-##..Visualize enrichment score..##
+##..Step 4: Visualize enrichment score..##
 
 # all cells
 color_key <- read.csv("./keys/cell_color_key.csv")
@@ -119,31 +123,3 @@ ggplot(mac_data, aes(fct_reorder(pheno_corrected, enrichment,
   geom_hline(yintercept=c(median(mac_data$enrichment)), linetype="dashed") +
   theme_minimal() +
   theme(legend.position = "none") 
-
-# just the means or medians
-
-###...Compare between the zones...##
-metabolic_data.m <- reshape2::melt(all_data_area, 
-                                   id.vars = c('sample', 'pheno_corrected'),
-                                   measure.vars= c('glyco_density',
-                                                   'IDO1_density',
-                                                   'glyco_freq_density',
-                                                   'IDO1_freq_density',
-                                                   'glyco_zone_freq_density',
-                                                   'IDO1_zone_freq_density'))
-
-plot_data <- metabolic_data.m[metabolic_data.m$variable %in% c('glyco_zone_freq_density',
-                                                               'IDO1_zone_freq_density'),]
-
-ggplot(data = plot_data, aes(x = variable, y = value)) +
-  geom_boxplot(width = 0.75, alpha = .6, fatten = NULL, show.legend = FALSE) +
-  stat_summary(fun.data = "mean_se", geom = "pointrange", show.legend = F, 
-               position = position_dodge(.75)) +
-  stat_compare_means(method= "wilcox.test", label = "p.format") +
-  theme_bw() +
-  theme(legend.position = "none") +
-  labs(x = 'Metabolic Zone') + 
-  labs(y = 'Frequency in Zone') +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.ticks.x=element_blank(), 
-        axis.text.x = element_text(angle=35,hjust=1)) + 
-  facet_wrap(~pheno_corrected, scales = c('free'))

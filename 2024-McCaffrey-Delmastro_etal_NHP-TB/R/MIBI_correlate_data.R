@@ -1,8 +1,10 @@
-## correlate_data.R
-## Date created: March 2, 2023
-## Authors: Erin McCaffrey 
-## Script takes a data sheet of feature (ie. cell frequencies) and runs correlation
-## between features and CFU in bulk or broken down by some metadata (ie. time)
+# MIBI_correlate_data.R
+# Created by: Erin McCaffrey 
+# Date created: March 2, 2023
+#
+# Overview: Script takes a data sheet of feature (ie. cell frequencies) and 
+# runs correlation between features and CFU in bulk or broken down by some 
+# metadata (ie. time)
 
 library(Hmisc)
 library("PerformanceAnalytics")
@@ -33,33 +35,36 @@ flattenCorrMatrix <- function(cormat, pmat) {
   )
 }
 
-## Read in data ##
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
+##..Step 1: Read in data..##
+
 data<-read.csv('cell_stats_all_samples_meta_data.csv')
 data<-droplevels(data[data$category == 'pheno_of_total',])
 data<-tibble::rowid_to_column(data, "ID")
 color_key <- read.csv("./keys/cell_color_key.csv")
 
-## Convert frequency data to format where there is 1 row per ID and columns are the freqs or counts ##
+##..Step 2: Convert frequency data to format where there is 1 row per ID and columns are the freqs or counts..##
+
 freq_data_bulk<-reshape2::dcast(data, sample + gran_CFU + necrosis_viable_ratio ~ variable, value.var = "freq_of_total", fun.aggregate = sum)
 count_data_bulk<-reshape2::dcast(data, sample + gran_CFU + necrosis_viable_ratio ~ variable, value.var = "cell_density", fun.aggregate = sum)
 
-## Convert NaN to 0 ##
+##..Step 3: Convert NaN to 0..##
+
 freq_data_bulk[is.na(freq_data_bulk)] <- 0
 count_data_bulk[is.na(count_data_bulk)] <- 0
 
-## Add in macrophage ratio ##
+##..Step 4: Add in macrophage ratio..##
+
 count_data_bulk$mac_ratio<-count_data_bulk$`CD11c+_Mac`/count_data_bulk$`CD14+CD11c+_Mac`
 count_data_bulk$log_CFU<-log10(1+count_data_bulk$gran_CFU)
 count_data_bulk$t_ratio<-count_data_bulk$`CD4+Tcell`/count_data_bulk$`CD8+Tcell`
-
 freq_data_bulk$log_CFU<-log10(1+freq_data_bulk$gran_CFU)
 
-## Remove unassigned cells due to inability to interpret ##
+##..Step 5: Remove unassigned cells due to inability to interpret..##
+
 count_data_bulk<-count_data_bulk[ , -which(names(count_data_bulk) %in% c("Unassigned"))]
 freq_data_bulk<-freq_data_bulk[ , -which(names(freq_data_bulk) %in% c("Unassigned"))]
 
-## Perform correlation analysis of everything against everything ##
+##..Step 6: Perform correlation analysis of everything against everything..##
 
 # option to subset
 corrdata<-freq_data_bulk
@@ -76,7 +81,7 @@ corrplot(corrmatrix, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45, p.mat = corrmat$P, sig.level = 0.01, insig = "blank")
 
 
-## Plot examples ##
+##..Step 7: Plot individual examples..##
 
 ggscatterstats(
   data = corrdata, 
@@ -90,16 +95,8 @@ ggplot(freq_data_bulk, aes(x=log_CFU, y = `CD4+Tcell`)) +
 individual_corr <-corr.test(corrdata$gran_CFU, corrdata$`CD11c+_Mac`, method = 'spearman')
 individual_corr
 
-## For chosen example, plot frequency in ascending CFU order ##
-ggplot(freq_data_bulk, aes(x=reorder(sample, `log_CFU`), y=`CD4+Tcell`, fill = log_CFU)) +
-  geom_bar(stat="Identity") +
-  theme_bw() + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        axis.title.x=element_blank(), axis.text.x = element_text(angle=35,hjust=1)) + 
-  labs(y="Frequency CD11c+_Mac (of total)", x='Specimen') 
+##..Step 8: Generate volcano of density relationships with CFU..##
 
-
-## Generate volcano of density relationships with CFU ##
 CFU_corr_data<-corr_results[corr_results$row =='log_CFU' | corr_results$column == 'log_CFU',]
 CFU_corr_data<-droplevels(CFU_corr_data[CFU_corr_data$row !='necrosis_viable_ratio' & 
                                           CFU_corr_data$row != 'mac_ratio' &
@@ -134,7 +131,7 @@ EnhancedVolcano(CFU_corr_data,
                 xlim = c(-1,1),
                 ylim = c(0, max(-log10(CFU_corr_data$adj.p), na.rm=T) + 0.3))
 
-##..Plot bi-axial scatters for all relationships..##
+##..Step 9: Plot bi-axial scatters for all relationships..##
 
 # melt data
 corrdata.m <- melt(corrdata, id.vars = c('sample','log_CFU','gran_CFU'))

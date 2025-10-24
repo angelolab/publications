@@ -1,5 +1,6 @@
 # MIBI_plot_cell_data.R
 # Author: Erin McCaffrey 
+# 
 # Overview: This script generates plots related to cell frequency and counts
 # across all granulomas. 
 
@@ -8,8 +9,8 @@ library(reshape2)
 library(gtools)
 library(ggplot2)
 
-##..Import data..##
-setwd("/Volumes/T7 Shield/MIBI_data/NHP_TB_Cohort/Panel2")
+##..Step 1: Import data..##
+
 data <- read.csv('cell_stats_all_samples_meta_data.csv')
 data <- droplevels(data[data$category == 'pheno_of_total',])
 data <- tibble::rowid_to_column(data, "ID")
@@ -17,7 +18,7 @@ metadata <- read.csv("./cohort_metadata/study_cohort_metadata.csv")
 animal_color_key <- read.csv("./keys/animal_color_key.csv")
 cell_color_key <- read.csv("./keys/cell_color_key.csv")
 
-##..Generate a plot of the total counts per animal..##
+##..Step 2: Generate a plot of the total counts per animal..##
 
 # generate sample by total counts
 total_counts <- data %>%
@@ -70,7 +71,7 @@ total_density <- ggplot(total_counts_area, aes(x=reorder(as.factor(Animal_Gran_C
   theme(axis.text.x=element_text(angle=45, hjust=1))
 total_density
 
-##..Summarize individual cell frequencies..##
+##..Step 3: Summarize individual cell frequencies..##
 
 # generate count by cell type
 total_subset_counts <- data %>%
@@ -85,6 +86,8 @@ total_subset_counts$frequency <- total_subset_counts$total / cell_total
 total_subset_counts <- total_subset_counts[order(-total_subset_counts$frequency),] 
 cell_order <- total_subset_counts$variable
 total_subset_counts$variable<- factor(total_subset_counts$variable, levels = cell_order)
+
+##..Step 4: Plot..##
 
 # get color key 
 plot_populations <- levels(factor(total_subset_counts$variable))
